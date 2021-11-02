@@ -16,9 +16,25 @@ CONSTRUCT {
             schema:nutrition [ a schema:NutritionInformation ;
                 schema:calories [ a schema:Energy ;
                     schema:name ?a ] ;
-                ] ;
+                ] ;            
 }
 
 WHERE {
-    BIND(IRI(?i) AS ?recipe)
+    BIND(IRI(?i) AS ?recipe) .
 }
+
+OFFSET 1
+
+CONSTRUCT {
+   ?recipe schema:recipeIngredient ?ingredient ;
+}
+
+WHERE {
+    BIND(IRI(?i) AS ?recipe) .
+
+    ?ingredients apf:strSplit (?d ",")
+    BIND(?ingredients as ?ingredient)                                                                                                                                                                                                    
+    filter(BOUND(?d))
+}
+
+OFFSET 1
