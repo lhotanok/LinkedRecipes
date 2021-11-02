@@ -1,0 +1,1 @@
+tarql -H ./queries/all_recipes.sparql ./datasets/all_recipes.csv > ./results/all_recipes.ttl

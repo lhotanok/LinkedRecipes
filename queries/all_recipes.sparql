@@ -2,17 +2,23 @@ PREFIX schema: <http://schema.org/>
 
 CONSTRUCT {
     ?recipe a schema:Recipe ;
-            schema:name ?name ;
-            schema:prepTime ?prep ;
-            schema:cookTime ?cook ;
-            schema:totalTime ?ready_in ;
-            schema:nutrition ?nutrition ;
-            schema:recipeInstructions ?directions .
+            schema:name ?e ;
+            
+            schema:prepTime ?f ;
+            schema:cookTime ?b ;
+            schema:totalTime ?h ;
 
-    ?nutrition a schema:NutritionInformation ;
-            schema:calories ?calories .
+            schema:recipeInstructions ?c ;
 
+            schema:aggregateRating [ a schema:AggregateRating ;
+                schema:ratingValue ?g ] ;
+
+            schema:nutrition [ a schema:NutritionInformation ;
+                schema:calories [ a schema:Energy ;
+                    schema:name ?a ] ;
+                ] ;
 }
+
 WHERE {
-    BIND(IRI(?url) AS ?recipe)
+    BIND(IRI(?i) AS ?recipe)
 }
