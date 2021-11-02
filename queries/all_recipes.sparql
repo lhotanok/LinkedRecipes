@@ -1,0 +1,18 @@
+PREFIX schema: <http://schema.org/>
+
+CONSTRUCT {
+    ?recipe a schema:Recipe ;
+            schema:name ?name ;
+            schema:prepTime ?prep ;
+            schema:cookTime ?cook ;
+            schema:totalTime ?ready_in ;
+            schema:nutrition ?nutrition ;
+            schema:recipeInstructions ?directions .
+
+    ?nutrition a schema:NutritionInformation ;
+            schema:calories ?calories .
+
+}
+WHERE {
+    BIND(IRI(?url) AS ?recipe)
+}
