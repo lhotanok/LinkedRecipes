@@ -1,0 +1,33 @@
+PREFIX schema: <http://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+    ?recipe a schema:Recipe ;
+            schema:name ?name ;
+            
+            schema:totalTime ?minutes ;
+
+            schema:recipeInstructions ?steps ;
+
+            schema:contributor [ a schema:Person ;
+                schema:identifier ?contributor_id ] ;           
+}
+
+WHERE {
+    BIND(IRI(CONCAT("https://www.food.com/recipe/", ?id)) AS ?recipe) .
+}
+
+CONSTRUCT {
+   ?recipe schema:recipeIngredient ?ingredient ;
+}
+
+WHERE {
+    BIND(IRI(CONCAT("https://www.food.com/recipe/", ?id)) AS ?recipe) .
+
+    BIND(STRDT(?ingredients, xsd:string) as ?ingr_literal) .
+    BIND(REPLACE(?ingr_literal, "[\\[\\]']", "") as ?ingr)
+
+    ?ingr_list apf:strSplit (?ingr ",")
+    BIND(?ingr_list as ?ingredient)                                                                                                                                                                                                    
+    filter(BOUND(?ingredients))
+}
