@@ -1,6 +1,10 @@
 PREFIX schema: <http://schema.org/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
+###########################################
+# construct general recipe info           #
+###########################################
+
 CONSTRUCT {
     ?recipe a schema:Recipe ;
             schema:name ?e ;
@@ -27,6 +31,10 @@ WHERE {
 }
 
 OFFSET 1
+
+###########################################
+# construct recipe ingredients            #
+###########################################
 
 CONSTRUCT {
    ?recipe schema:recipeIngredient ?ingredient ;

@@ -1,6 +1,10 @@
 PREFIX schema: <http://schema.org/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
+###########################################
+# construct general recipe info           #
+###########################################
+
 CONSTRUCT {
     ?recipe a schema:Recipe ;
             schema:name ?recipeName ;
@@ -11,15 +15,13 @@ CONSTRUCT {
 
             schema:recipeInstructions ?steps ;
 
-            schema:contributor [ a schema:Person ;
+            schema:author [ a schema:Person ;
                 schema:identifier ?contributor_id ] ;  
 
             schema:datePublished ?date ;
 
             schema:nutrition [ a schema:NutritionInformation ;
-                schema:calories [ a schema:Energy ;
-                    schema:name ?energy ] ;
-                ] ;
+                schema:name ?nutrition ] ; 
 }
 
 WHERE {
@@ -28,6 +30,10 @@ WHERE {
     BIND(STRDT(?submitted, schema:DateTime) as ?date) .
     BIND(STRDT(?minutes, xsd:integer) as ?totalTime) .
 }
+
+###########################################
+# construct recipe ingredients            #
+###########################################
 
 CONSTRUCT {
    ?recipe schema:recipeIngredient ?ingredient ;

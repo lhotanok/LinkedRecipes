@@ -1,0 +1,62 @@
+PREFIX schema: <http://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+###########################################
+# construct general recipe info           #
+###########################################
+
+CONSTRUCT {
+    ?recipe a schema:Recipe ;
+            schema:name ?title ;
+            schema:description ?description ;
+            schema:keywords ?keywords ;
+            schema:recipeCuisine ?cusine ;
+            
+            schema:prepTime ?preparationTime ;
+            schema:cookTime ?cookTime ;
+            schema:recipeYield ?recipeYield ;
+
+            schema:author [ a schema:Person ;
+                schema:name ?author ] ; 
+
+            schema:aggregateRating [ a schema:AggregateRating ;
+                schema:ratingValue ?recipeRatings ] ;
+
+            schema:nutrition [ a schema:NutritionInformation ;
+                schema:name ?nutritionInfo ] ;            
+}
+
+WHERE {
+    BIND(STRDT(?title, xsd:string) as ?title_literal) .
+    BIND(LCASE(REPLACE(?title_literal, " ", "_")) as ?encoded_title) .
+    BIND(CONCAT(ENCODE_FOR_URI(?encoded_title), "/") as ?merged_title) .
+    BIND(IRI(CONCAT("https://www.bbc.co.uk/food/recipes/", CONCAT(?merged_title, ?id))) AS ?recipe) .
+
+    BIND(STRDT(?energy, xsd:integer) as ?recipeEnergy) .
+    BIND(STRDT(?ratings, xsd:integer) as ?recipeRatings) .
+    BIND(STRDT(?prepTime, xsd:integer) as ?preparationTime) .
+    BIND(STRDT(?cookingTime, xsd:integer) as ?cookTime) .
+    BIND(STRDT(?serves, xsd:integer) as ?recipeYield) .
+}
+
+###########################################
+# construct recipe ingredients            #
+###########################################
+
+CONSTRUCT {
+   ?recipe schema:recipeIngredient ?ingredient ;
+}
+
+WHERE {
+    BIND(STRDT(?title, xsd:string) as ?title_literal) .
+    BIND(LCASE(REPLACE(?title_literal, " ", "_")) as ?encoded_title) .
+    BIND(CONCAT(ENCODE_FOR_URI(?encoded_title), "/") as ?merged_title) .
+    BIND(IRI(CONCAT("https://www.bbc.co.uk/food/recipes/", CONCAT(?merged_title, ?id))) AS ?recipe) .
+
+    BIND(STRDT(?ingredients, xsd:string) as ?ingr_literal) .
+    BIND(REPLACE(?ingr_literal, "[\\[\\]']", "") as ?ingr)
+
+    ?ingr_list apf:strSplit (?ingr ",")
+    BIND(?ingr_list as ?ingredient)                                                                                                                                                                                                    
+    filter(BOUND(?ingredients))
+}
