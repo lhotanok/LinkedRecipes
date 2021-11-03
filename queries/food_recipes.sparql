@@ -3,18 +3,30 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 CONSTRUCT {
     ?recipe a schema:Recipe ;
-            schema:name ?name ;
+            schema:name ?recipeName ;
             
-            schema:totalTime ?minutes ;
+            schema:totalTime ?totalTime ;
+            schema:keywords ?tags ;
+            schema:description ?description ;
 
             schema:recipeInstructions ?steps ;
 
             schema:contributor [ a schema:Person ;
-                schema:identifier ?contributor_id ] ;           
+                schema:identifier ?contributor_id ] ;  
+
+            schema:datePublished ?date ;
+
+            schema:nutrition [ a schema:NutritionInformation ;
+                schema:calories [ a schema:Energy ;
+                    schema:name ?energy ] ;
+                ] ;
 }
 
 WHERE {
     BIND(IRI(CONCAT("https://www.food.com/recipe/", ?id)) AS ?recipe) .
+    BIND(REPLACE(?name, "[ ]+", " ") as ?recipeName)
+    BIND(STRDT(?submitted, schema:DateTime) as ?date) .
+    BIND(STRDT(?minutes, xsd:integer) as ?totalTime) .
 }
 
 CONSTRUCT {

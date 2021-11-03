@@ -1,4 +1,5 @@
 PREFIX schema: <http://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 CONSTRUCT {
     ?recipe a schema:Recipe ;
@@ -11,16 +12,18 @@ CONSTRUCT {
             schema:recipeInstructions ?c ;
 
             schema:aggregateRating [ a schema:AggregateRating ;
-                schema:ratingValue ?g ] ;
+                schema:ratingValue ?ratings ] ;
 
             schema:nutrition [ a schema:NutritionInformation ;
                 schema:calories [ a schema:Energy ;
-                    schema:name ?a ] ;
+                    schema:name ?energy ] ;
                 ] ;            
 }
 
 WHERE {
     BIND(IRI(?i) AS ?recipe) .
+    BIND(STRDT(?a, xsd:integer) as ?energy) .
+    BIND(STRDT(?g, xsd:decimal) as ?ratings) .
 }
 
 OFFSET 1
