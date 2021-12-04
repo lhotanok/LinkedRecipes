@@ -13,3 +13,7 @@ Dataset generated from: https://apify.com/dtrungtin/allrecipes-scraper
 
 I included dataset files directly in the source directory as I had to edit them before use.
 I only extracted each 10th recipe from Kaggle dataset to reduce the file size (which was originally over 200 MB).
+
+All triplification scripts were used with Tarql command-line tool for conversion of the original CSV files into RDF format.
+I downloaded Food recipes and All Recipes datasets directly in CSV format. BBC Recipes were originally in JSON format 
+so I converted them to CSV to have all datasets in the same format. This way I could operate on them using similar queries.
