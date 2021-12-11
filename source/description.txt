@@ -4,8 +4,8 @@ https://www.food.com/
 Dataset link: https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions?select=RAW_recipes.csv
 
 
-https://www.bbc.co.uk/food/recipes
-Dataset link (bbccouk-recipes.json.xz): https://archive.org/download/recipes-en-201706/
+https://www.bbcgoodfood.com/
+Dataset link: https://raw.githubusercontent.com/mneedham/bbcgoodfood/master/stream_all.json
 
 
 https://www.allrecipes.com/
@@ -13,7 +13,3 @@ Dataset generated from: https://apify.com/dtrungtin/allrecipes-scraper
 
 I included dataset files directly in the source directory as I had to edit them before use.
 I only extracted each 10th recipe from Kaggle dataset to reduce the file size (which was originally over 200 MB).
-
-All triplification scripts were used with Tarql command-line tool for conversion of the original CSV files into RDF format.
-I downloaded Food recipes and All Recipes datasets directly in CSV format. BBC Recipes were originally in JSON format 
-so I converted them to CSV to have all datasets in the same format. This way I could operate on them using similar queries.
