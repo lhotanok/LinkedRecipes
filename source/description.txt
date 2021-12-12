@@ -12,4 +12,17 @@ https://www.allrecipes.com/
 Dataset generated from: https://apify.com/dtrungtin/allrecipes-scraper
 
 I included dataset files directly in the source directory as I had to edit them before use.
-I only extracted each 10th recipe from Kaggle dataset to reduce the file size (which was originally over 200 MB).
+E.g. I reduced dataset sizes to avoid exceeding GitHub 100 MB limit per file and Silk memory
+limit. I extracted each 5th recipe from BBC recipes dataset and each 20th from Kaggle dataset.
+
+I defined jsonld context for all datasets as the original format was json for BBC Recipes and All Recipes.
+Kaggle csv dataset was converted to json as it's more suitable format with respect to arrays previously saved
+as string in one column. I splitted all strings representing multiple items to arrays and defined jsonld
+context the same way as with BBC Recipes and All Recipes. Node.js scripts stored in triplifier directories
+were used for json -> jsonld conversion. They took care of dataset parsing, defining the jsonld context
+dynamically and creating all needed IRIs.
+
+For linking the individual datasets, Silk workbench was used. It doesn't accept jsonld directly so I converted
+all jsonld output files into nquads format. I used node.js library jsonld-cli for the conversion, namely
+the command in the following format (called from download directory, example usage with Food Recipes):
+jsonld normalize -q "./food-recipes/output/food-recipes.jsonld" > "./food-recipes/output/food-recipes.nq"

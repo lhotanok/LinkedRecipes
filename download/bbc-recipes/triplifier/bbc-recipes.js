@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { parse } = require('path/posix');
 
 const INPUT_PATH = `${__dirname}/../input/bbc-recipes.json`;
 const OUTPUT_PATH = `${__dirname}/../output/bbc-recipes.jsonld`;
@@ -7,7 +6,6 @@ const IRI_BASE = 'http://example.org/graphs/bbcRecipes';
 
 const XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
 const XSD_FLOAT = 'http://www.w3.org/2001/XMLSchema#float';
-const XSD_DATETIME = 'http://www.w3.org/2001/XMLSchema#dateTime';
 
 const OWL_MINUTES = 'http://www.w3.org/TR/owl-time/#time:minutes';
 

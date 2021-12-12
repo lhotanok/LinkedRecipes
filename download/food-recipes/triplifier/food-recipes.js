@@ -15,6 +15,18 @@ main();
 function main() {
     const recipes = JSON.parse(fs.readFileSync(INPUT_PATH, 'utf8'));
 
+    // const reducedItems = [];
+    // for (let index = 0; index < recipes.length; index++) {
+    //     const element = recipes[index];
+    //     if (index % 10 === 0) {
+    //         reducedItems.push(element);
+    //     }
+    // }
+
+    // fs.writeFileSync(INPUT_PATH, JSON.stringify(reducedItems), 'utf8');
+
+    // return;
+
     const normalizedRecipes = normalizeRecipesInput(recipes);
 
     const jsonld = {
