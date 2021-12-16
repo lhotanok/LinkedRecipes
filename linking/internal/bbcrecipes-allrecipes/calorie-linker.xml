@@ -1,0 +1,65 @@
+<Silk>
+        <Prefixes>
+      <Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/><Prefix id="gr" namespace="http://purl.org/goodrelations/v1#"/><Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/><Prefix id="skos" namespace="http://www.w3.org/2004/02/skos/core#"/><Prefix id="schema" namespace="http://schema.org/"/><Prefix id="ex" namespace="http://example.org/ns#"/><Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#"/>
+    </Prefixes>
+        <DataSources>
+          <Dataset id="bbcrecipes" type="file" uriProperty=""><MetaData>
+        <Label></Label>
+        <Description></Description>
+        
+      </MetaData>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[bbcrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/graphs/bbcRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+          </Dataset><Dataset id="allrecipes" type="file" uriProperty=""><MetaData>
+        <Label></Label>
+        <Description></Description>
+        
+      </MetaData>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[allrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/graphs/allRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+          </Dataset>
+        </DataSources>
+        <Interlinks>
+          <Interlink id="bbc-all-calories-linker"><MetaData>
+        <Label></Label>
+        <Description></Description>
+        <Modified>2021-12-16T22:27:51.074Z</Modified>
+      </MetaData>
+        <SourceDataset dataSource="bbcrecipes" var="a" typeUri="http://example.org/ns#Calories">
+        <RestrictTo>
+          
+        </RestrictTo>
+      </SourceDataset>
+        <TargetDataset dataSource="allrecipes" var="b" typeUri="http://example.org/ns#Calories">
+        <RestrictTo>
+          
+        </RestrictTo>
+      </TargetDataset>
+        <LinkageRule linkType="&lt;http://www.w3.org/2002/07/owl#sameAs&gt;">
+        <Compare id="equality1" required="false" weight="1" metric="equality" threshold="0.0" indexing="true">
+            <TransformInput id="convertFloatToInt1" function="regexReplace">
+        <Input id="sourcePath1" path="/&lt;http://purl.org/goodrelations/v1#hasValueFloat&gt;"/>
+        <Param name="regex" xml:space="preserve"><![CDATA[(\.(.)*)$]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput><TransformInput id="convertFloatToInt2" function="regexReplace">
+        <Input id="targetPath1" path="/&lt;http://purl.org/goodrelations/v1#hasValueFloat&gt;"/>
+        <Param name="regex" xml:space="preserve"><![CDATA[(\.(.)*)$]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput>
+          </Compare>
+        <Filter/>
+      </LinkageRule>
+        <Outputs>
+          <Output id="bbc-all-calories"></Output>
+        </Outputs>
+      </Interlink>
+        </Interlinks>
+        <Transforms>
+          
+        </Transforms>
+        <Outputs>
+          <Dataset id="bbc-all-calories" type="file" uriProperty=""><MetaData>
+        <Label></Label>
+        <Description></Description>
+        
+      </MetaData>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Triples]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[500]]></Param><Param name="file" xml:space="preserve"><![CDATA[bbc-all-calories.nt]]></Param><Param name="graph" xml:space="preserve"><![CDATA[]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+          </Dataset>
+        </Outputs>
+      </Silk>

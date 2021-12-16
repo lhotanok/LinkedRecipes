@@ -6,7 +6,7 @@ const IRI_BASE = 'http://example.org/graphs/foodRecipes';
 
 const XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
 const XSD_FLOAT = 'http://www.w3.org/2001/XMLSchema#float';
-const XSD_DATETIME = 'http://www.w3.org/2001/XMLSchema#dateTime';
+const XSD_DATE = 'http://www.w3.org/2001/XMLSchema#date';
 
 const OWL_MINUTES = 'http://www.w3.org/TR/owl-time/#time:minutes';
 
@@ -61,10 +61,7 @@ function main() {
         saveNewEntities(entities, graphEntities);
     });
 
-    jsonld['@graph'].push(
-        buildClassDefinition('Ingredient', 'NamedIndividual', jsonld['@context']),
-        buildClassDefinition('Tag', 'NamedIndividual', jsonld['@context']),
-    )
+    jsonld['@graph'].push(...buildClassDefinitions(jsonld['@context']));
 
     Object.values(graphEntities).forEach((entity) => {
         jsonld['@graph'].push(...Object.values(entity));
@@ -111,7 +108,7 @@ function normalizeRecipesInput(input) {
 }
 
 function normalizeText(text) {
-    return text.replace(/[ ]+/g, ' ').replaceAll(/[\n\t]/g, '').replaceAll(' ,', ',').trim();
+    return text.replace(/[-]+/g, ' ').replace(/[ ]+/g, ' ').replace(/[\n\t]/g, '').replaceAll(' ,', ',').trim();
 }
 
 function normalizeArray(array) {
@@ -130,13 +127,20 @@ function buildJsonldContext() {
         "type": "@type",
         "Class": "http://www.w3.org/2002/07/owl#Class",
         "NamedIndividual": "http://www.w3.org/2002/07/owl#NamedIndividual",
+        "QuantitativeValue": "http://purl.org/goodrelations/v1#QuantitativeValue",
         "Recipe": "http://schema.org/Recipe",
         "Person": "http://schema.org/Person",
-        "Ingredient": "http://example.org/ns#Ingredient",
-        "Tag": "http://example.org/ns#Tag",
         "NutritionInformation": "http://schema.org/NutritionInformation",
         "ItemList": "http://schema.org/ItemList",
         "HowToDirection": "http://schema.org/HowToDirection",
+        "Ingredient": "http://example.org/ns#Ingredient",
+        "Tag": "http://example.org/ns#Tag",
+        "Calories": "http://example.org/ns#Calories",
+        "ProteinContent": "http://example.org/ns#ProteinContent",
+        "SugarContent": "http://example.org/ns#SugarContent",
+        "FatContent": "http://example.org/ns#FatContent",
+        "SodiumContent": "http://example.org/ns#SodiumContent",
+        "SaturatedFatContent": "http://example.org/ns#SaturatedFatContent",
         "name": "http://schema.org/name",
         "description": "http://schema.org/description",
         "id": { 
@@ -151,36 +155,23 @@ function buildJsonldContext() {
         },
         "submitted": { 
             "@id": "http://schema.org/datePublished",
-            "@type": XSD_DATETIME
+            "@type": XSD_DATE
         },
         "author": "http://schema.org/contributor",
         "ingredients": "http://schema.org/recipeIngredient",
         "tags": "http://schema.org/keywords",
         "nutrition": "http://schema.org/nutrition",
-        "calories": { 
-            "@id":"http://schema.org/calories",
-            "@type": XSD_INTEGER
-        },
-        "protein": { 
-            "@id":"http://schema.org/proteinContent",
+        "unit": "http://purl.org/goodrelations/v1#hasUnitOfMeasurement",
+        "quantity": {
+            "@id": "http://purl.org/goodrelations/v1#hasValueFloat",
             "@type": XSD_FLOAT
         },
-        "sugar": { 
-            "@id":"http://schema.org/sugarContent",
-            "@type": XSD_FLOAT
-        },
-        "fat": { 
-            "@id":"http://schema.org/fatContent",
-            "@type": XSD_FLOAT
-        },
-        "saturatedFat": { 
-            "@id":"http://schema.org/saturatedFatContent",
-            "@type": XSD_FLOAT
-        },
-        "sodium": { 
-            "@id":"http://schema.org/sodiumContent",
-            "@type": XSD_FLOAT
-        },
+        "calories": "http://schema.org/calories",
+        "protein": "http://schema.org/proteinContent",
+        "sugar": "http://schema.org/sugarContent",
+        "fat": "http://schema.org/fatContent",
+        "saturatedFat": "http://schema.org/saturatedFatContent",
+        "sodium": "http://schema.org/sodiumContent",
         "steps": "http://schema.org/recipeInstructions",
         "directionList": "http://schema.org/itemListElement",
         "position": { 
@@ -209,7 +200,25 @@ function saveNewEntities(entities, saved) {
     });
 }
 
-function buildClassDefinition(name, subClassOf, context) {
+function buildClassDefinitions(context) {
+    const QUANTITATIVE_VALUE = 'QuantitativeValue';
+    const NAMED_INDIVIDUAL = 'NamedIndividual';
+
+    const classes = [
+        { name: 'Ingredient', subClassOf: NAMED_INDIVIDUAL },
+        { name: 'Tag', subClassOf: NAMED_INDIVIDUAL },
+        { name: 'Calories', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'ProteinContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'FatContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'SaturatedFatContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'SugarContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'SodiumContent', subClassOf: QUANTITATIVE_VALUE },
+    ];
+
+    return classes.map((classInfo) => buildClassDefinition(classInfo, context));
+}
+
+function buildClassDefinition({ name, subClassOf }, context) {
     return {
         '@id': `http://example.org/ns#${name}`,
         type: 'Class',
@@ -219,16 +228,25 @@ function buildClassDefinition(name, subClassOf, context) {
 }
 
 function buildRecipeNutritionInformation(nutrition, recipeIri) {
-    const nutritionInfo = {
-        '@id': `${recipeIri}/nutrition`,
-        type: 'NutritionInformation',
-        calories: parseInt(nutrition[0].toString()),
-        protein: nutrition[4],
-        sugar: nutrition[2],
-        fat: nutrition[1],
-        saturatedFat: nutrition[5],
-        sodium: nutrition[3]
+    const NUTRITION_IRI = `${recipeIri}/nutrition`;
+
+    const nutritionMapping = {
+        calories: { type: 'Calories', unit: 'kcal', quantity: parseInt(nutrition[0].toString()) },
+        protein: { type: 'ProteinContent', unit: 'g', quantity: nutrition[4] },
+        sugar: { type: 'SugarContent', unit: 'g', quantity: nutrition[2] },
+        fat: { type: 'FatContent', unit: 'g', quantity: nutrition[1] },
+        saturatedFat: { type: 'SaturatedFatContent', unit: 'g', quantity: nutrition[5] },
+        sodium: { type: 'SodiumContent', unit: 'mg', quantity: nutrition[3] },
     }
+    
+    const nutritionInfo = {
+        '@id': NUTRITION_IRI,
+        type: 'NutritionInformation',
+    }
+    
+    Object.keys(nutritionMapping).forEach((key) => {
+        nutritionInfo[key] = { '@id': `${NUTRITION_IRI}/${key}`, ...nutritionMapping[key] };
+    })
 
     return nutritionInfo;
 }
