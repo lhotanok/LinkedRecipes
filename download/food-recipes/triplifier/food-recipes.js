@@ -22,6 +22,13 @@ function main() {
         '@id': IRI_BASE,
         '@graph': []
     };
+
+    const graphEntities = {
+        authors: {},
+        ingredients: {},
+        tags: {},
+        recipes: {},
+    }
     
     normalizedRecipes.forEach((recipe) => {    
         const { name, id, minutes, contributor_id, submitted, tags, nutrition, steps, description, ingredients } = recipe;
@@ -29,24 +36,39 @@ function main() {
         const normalizedName = normalizeText(name);
     
         const RECIPE_IRI = `${IRI_BASE}/recipe/${convertToIri(normalizedName)}`;
+
+        const entities = {
+            authors: [buildAuthor(contributor_id)],
+            ingredients: buildIngredients(normalizeArray(ingredients)),
+            tags: buildTags(normalizeArray(tags)),
+        };
     
-        const jsonldRecipe = {
+        entities.recipes = [{
             '@id': RECIPE_IRI,
             type: 'Recipe',
             name: normalizedName,
             id,
+            description: normalizeText(description),
             minutes,
             submitted,
-            author: buildAuthor(contributor_id),
-            description: normalizeText(description),
-            ingredients: buildRecipeIngredients(normalizeArray(ingredients)),
-            tags: buildRecipeTags(normalizeArray(tags)),
+            author: extractIds(entities.authors),
+            ingredients: extractIds(entities.ingredients),
+            tags: extractIds(entities.tags),
             steps: buildRecipeInstructions(normalizeArray(steps), RECIPE_IRI),
-            nutrition: buildNutritionInformation(nutrition, RECIPE_IRI)
-        };
-    
-        jsonld['@graph'].push(jsonldRecipe);
+            nutrition: buildRecipeNutritionInformation(nutrition, RECIPE_IRI)
+        }];
+
+        saveNewEntities(entities, graphEntities);
     });
+
+    jsonld['@graph'].push(
+        buildClassDefinition('Ingredient', 'NamedIndividual', jsonld['@context']),
+        buildClassDefinition('Tag', 'NamedIndividual', jsonld['@context']),
+    )
+
+    Object.values(graphEntities).forEach((entity) => {
+        jsonld['@graph'].push(...Object.values(entity));
+    })
 
     fs.writeFileSync(OUTPUT_PATH, JSON.stringify(jsonld, null, 2));
 }
@@ -106,6 +128,8 @@ function buildJsonldContext() {
     return {
         "@language": "en",
         "type": "@type",
+        "Class": "http://www.w3.org/2002/07/owl#Class",
+        "NamedIndividual": "http://www.w3.org/2002/07/owl#NamedIndividual",
         "Recipe": "http://schema.org/Recipe",
         "Person": "http://schema.org/Person",
         "Ingredient": "http://example.org/ns#Ingredient",
@@ -120,6 +144,7 @@ function buildJsonldContext() {
             "@type": XSD_INTEGER
         },
         "label": "http://www.w3.org/2000/01/rdf-schema#label",
+        "subClassOf": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
         "minutes": { 
             "@id": "http://schema.org/totalTime",
             "@type": OWL_MINUTES
@@ -166,7 +191,34 @@ function buildJsonldContext() {
     };
 }
 
-function buildNutritionInformation(nutrition, recipeIri) {
+function extractIds(items) {
+    return items.map((item) => ({ '@id': item['@id'] }));
+}
+
+function saveNewEntities(entities, saved) {
+    Object.keys(entities).forEach((key) => {
+        const items = entities[key];
+
+        items.forEach((item) => {
+            const id = item['@id'];
+
+            if (!saved[key][id]) {
+                saved[key][id] = item;
+            }
+        });
+    });
+}
+
+function buildClassDefinition(name, subClassOf, context) {
+    return {
+        '@id': `http://example.org/ns#${name}`,
+        type: 'Class',
+        label: name,
+        subClassOf: { '@id': context[subClassOf] },
+    }
+}
+
+function buildRecipeNutritionInformation(nutrition, recipeIri) {
     const nutritionInfo = {
         '@id': `${recipeIri}/nutrition`,
         type: 'NutritionInformation',
@@ -231,10 +283,10 @@ function buildLabeledItems(items, category, type) {
     return labeledItems;
 }
 
-function buildRecipeIngredients(ingredients) {
+function buildIngredients(ingredients) {
     return buildLabeledItems(ingredients, 'ingredient', 'Ingredient');
 }
 
-function buildRecipeTags(keywords) {
+function buildTags(keywords) {
     return buildLabeledItems(keywords, 'tag', 'Tag');
 }

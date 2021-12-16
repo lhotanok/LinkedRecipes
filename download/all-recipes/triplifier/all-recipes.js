@@ -17,31 +17,48 @@ function main() {
     const jsonld = {
         '@context': buildJsonldContext(),
         '@id': IRI_BASE,
-        '@graph': [],
+        '@graph': []
     };
+
+    const graphEntities = {
+        ingredients: {},
+        recipes: {},
+    }
     
     recipes.forEach((recipe) => {
         const { name, prepTime, cookTime, totalTime, url, directions, ingredients, nutrition, rating, servings, reviews } = recipe;
+
+        // console.log(`prep: ${prepTime}, cook: ${cookTime}, total: ${totalTime}`);
     
         const RECIPE_IRI = `${IRI_BASE}/recipe/${convertToIri(name)}`;
+
+        const entities = {
+            ingredients: buildIngredients(ingredients),
+        };
     
-        const jsonldRecipe = {
+        entities.recipes = [{
             '@id': RECIPE_IRI,
             type: 'Recipe',
             name,
             url,
-            prepTime,
-            cookTime,
-            totalTime,
             servings,
+            prepTime: parseMinutes(prepTime),
+            cookTime: parseMinutes(cookTime),
+            totalTime: parseMinutes(totalTime),
+            ingredients: extractIds(entities.ingredients),
             rating: buildAggregateRating(rating, reviews, RECIPE_IRI),
             directions: buildRecipeInstructions(directions, RECIPE_IRI),
-            ingredients: buildRecipeIngredients(ingredients),
-            nutrition: buildNutritionInformation(nutrition, RECIPE_IRI),
-        };
+            nutrition: buildRecipeNutritionInformation(nutrition, RECIPE_IRI),
+        }];
     
-        jsonld['@graph'].push(jsonldRecipe);
+        saveNewEntities(entities, graphEntities);
     });
+
+    jsonld['@graph'].push(...buildClassDefinitions(jsonld['@context']));
+
+    Object.values(graphEntities).forEach((entity) => {
+        jsonld['@graph'].push(...Object.values(entity));
+    })
 
     fs.writeFileSync(OUTPUT_PATH, JSON.stringify(jsonld, null, 2));
 }
@@ -56,15 +73,25 @@ function buildJsonldContext() {
     return {
         "@language": "en",
         "type": "@type",
+        "Class": "http://www.w3.org/2002/07/owl#Class",
         "Recipe": "http://schema.org/Recipe",
         "NutritionInformation": "http://schema.org/NutritionInformation",
         "ItemList": "http://schema.org/ItemList",
         "HowToDirection": "http://schema.org/HowToDirection",
-        "QuantitativeValue": "http://schema.org/QuantitativeValue",
+        "QuantitativeValue": "http://purl.org/goodrelations/v1#QuantitativeValue",
         "AggregateRating": "http://schema.org/AggregateRating",
+        "Ingredient": "http://example.org/ns#Ingredient",
+        "Calories": "http://example.org/ns#Calories",
+        "ProteinContent": "http://example.org/ns#ProteinContent",
+        "CarbohydrateContent": "http://example.org/ns#CarbohydrateContent",
+        "FatContent": "http://example.org/ns#FatContent",
+        "CholesterolContent": "http://example.org/ns#CholesterolContent",
+        "SodiumContent": "http://example.org/ns#SodiumContent",
+        "subClassOf": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+        "prefLabel": "http://www.w3.org/2004/02/skos/core#prefLabel",
+        "altLabel": "http://www.w3.org/2004/02/skos/core#altLabel",
+        "description": "http://www.w3.org/2004/02/skos/core#note",
         "name": "http://schema.org/name",
-        "altName": "http://schema.org/alternateName",
-        "description": "http://schema.org/description",
         "url": { 
             "@id": "http://schema.org/url",
             "@type": "http://schema.org/URL"
@@ -82,9 +109,9 @@ function buildJsonldContext() {
             "@type": OWL_MINUTES
         },
         "ingredients": "http://schema.org/recipeIngredient",
-        "unit": "http://schema.org/unitText",
-        "quantity": { 
-            "@id":"http://schema.org/value",
+        "unit": "http://purl.org/goodrelations/v1#hasUnitOfMeasurement",
+        "quantity": {
+            "@id": "http://purl.org/goodrelations/v1#hasValueFloat",
             "@type": XSD_FLOAT
         },
         "rating": "http://schema.org/aggregateRating",
@@ -97,30 +124,12 @@ function buildJsonldContext() {
             "@type": XSD_INTEGER
         },
         "nutrition": "http://schema.org/nutrition",
-        "calories": { 
-            "@id":"http://schema.org/calories",
-            "@type": XSD_INTEGER
-        },
-        "protein": { 
-            "@id":"http://schema.org/proteinContent",
-            "@type": XSD_FLOAT
-        },
-        "carbohydrates": { 
-            "@id":"http://schema.org/carbohydrateContent",
-            "@type": XSD_FLOAT
-        },
-        "fat": { 
-            "@id":"http://schema.org/fatContent",
-            "@type": XSD_FLOAT
-        },
-        "cholesterol": { 
-            "@id":"http://schema.org/cholesterolContent",
-            "@type": XSD_FLOAT
-        },
-        "sodium": { 
-            "@id":"http://schema.org/sodiumContent",
-            "@type": XSD_FLOAT
-        },
+        "calories": "http://schema.org/calories",
+        "protein": "http://schema.org/proteinContent",
+        "carbohydrates": "http://schema.org/carbohydrateContent",
+        "fat": "http://schema.org/fatContent",
+        "cholesterol": "http://schema.org/cholesterolContent",
+        "sodium": "http://schema.org/sodiumContent",
         "servings": { 
             "@id":"http://schema.org/recipeYield",
             "@type": XSD_INTEGER
@@ -135,6 +144,70 @@ function buildJsonldContext() {
     };
 }
 
+function buildClassDefinitions(context) {
+    const QUANTITATIVE_VALUE = 'QuantitativeValue';
+
+    const classes = [
+        { name: 'Ingredient', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'Calories', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'ProteinContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'CarbohydrateContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'FatContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'CholesterolContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'SodiumContent', subClassOf: QUANTITATIVE_VALUE },
+    ];
+
+    return classes.map((classInfo) => buildClassDefinition(classInfo, context));
+}
+
+function buildClassDefinition(classInfo, context) {
+    const { name, subClassOf } = classInfo;
+    return {
+        '@id': `http://example.org/ns#${name}`,
+        type: 'Class',
+        label: name,
+        subClassOf: { '@id': context[subClassOf] },
+    }
+}
+
+function extractIds(items) {
+    return items.map((item) => ({ '@id': item['@id'] }));
+}
+
+function saveNewEntities(entities, saved) {
+    Object.keys(entities).forEach((key) => {
+        const items = entities[key];
+
+        items.forEach((item) => {
+            const id = item['@id'];
+
+            if (!saved[key][id]) {
+                saved[key][id] = item;
+            }
+        });
+    });
+}
+
+function parseMinutes(text) {
+    if (!text) return null;
+
+    const splits = text.replace(/[^0-9 ]/g, '').replace(/( )+/g, ' ').trim().split(' ');
+
+    if (splits.length === 0) return null;
+
+    let minutes = parseInt(splits[0], 10);
+
+    if (text.includes('hr')) {
+        minutes *= 60;
+    }
+
+    if (splits.length > 1) {
+        minutes += parseInt(splits[1], 10);
+    }
+
+    return minutes;
+}
+
 function buildAggregateRating(ratings, reviewCount, recipeIri) {
     const RATING_TYPE = 'AggregateRating';
 
@@ -146,12 +219,38 @@ function buildAggregateRating(ratings, reviewCount, recipeIri) {
     }
 }
 
-function buildNutritionInformation(nutrition, recipeIri) {
-    return {
-        '@id': `${recipeIri}/nutrition`,
-        type: 'NutritionInformation',
-        ...nutrition
+function buildRecipeNutritionInformation(nutrition, recipeIri) {
+    const NUTRITION_IRI = `${recipeIri}/nutrition`;
+
+    const NUTRITION_MAPPING = {
+        calories: { type: 'Calories', unit: 'kcal'},
+        protein: { type: 'ProteinContent', unit: 'g'},
+        carbohydrates: { type: 'CarbohydrateContent', unit: 'g'},
+        fat: { type: 'FatContent', unit: 'g'},
+        cholesterol: { type: 'CholesterolContent', unit: 'mg'},
+        sodium: { type: 'SodiumContent', unit: 'mg'},
     }
+
+    const nutritionInfo = {
+        '@id': NUTRITION_IRI,
+        type: 'NutritionInformation',
+    }
+
+    Object.keys(nutrition).forEach((key) => {
+        if (key) {
+            const { type, unit } = NUTRITION_MAPPING[key];
+            const quantity = nutrition[key];
+    
+            nutritionInfo[key] = {
+                "@id": `${NUTRITION_IRI}/${key}`,
+                type,
+                quantity,
+                unit,
+            }
+        }
+    })
+    
+    return nutritionInfo;
 }
 
 function buildRecipeInstructions(directions, recipeIri) {
@@ -176,7 +275,7 @@ function buildRecipeInstructions(directions, recipeIri) {
     return recipeInstructions;
 }
 
-function buildRecipeIngredients(ingredients) {
+function buildIngredients(ingredients) {
     const INGREDIENT_BASE_IRI = `${IRI_BASE}/ingredient`;
 
     const recipeIngredients = [];
@@ -204,12 +303,12 @@ function buildRecipeIngredients(ingredients) {
 
         recipeIngredients.push({
             "@id": `${INGREDIENT_BASE_IRI}/${convertToIri(idName)}`,
-            type: 'QuantitativeValue',
-            name: idName,
-            altName,
+            type: 'Ingredient',
+            prefLabel: idName,
+            altLabel: altName,
             description: name,
-            unit,
             quantity: parseFloat(parsedQuantity),
+            unit,
         });
     })
 

@@ -1,0 +1,101 @@
+<Silk>
+        <Prefixes>
+      <Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/><Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#"/><Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/><Prefix id="schema" namespace="http://schema.org/"/><Prefix id="ex" namespace="http://example.org/ns#"/>
+    </Prefixes>
+        <DataSources>
+          <Dataset id="bbcrecipes" type="file" uriProperty=""><MetaData>
+        <Label></Label>
+        <Description></Description>
+        
+      </MetaData>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[bbcrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/graphs/bbcRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+          </Dataset><Dataset id="foodrecipes" type="file" uriProperty=""><MetaData>
+        <Label></Label>
+        <Description></Description>
+        
+      </MetaData>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[foodrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/graphs/foodRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+          </Dataset>
+        </DataSources>
+        <Interlinks>
+          <Interlink id="bbc-food-tag-linker"><MetaData>
+        <Label></Label>
+        <Description></Description>
+        <Modified>2021-12-16T13:03:41.552Z</Modified>
+      </MetaData>
+        <SourceDataset dataSource="bbcrecipes" var="a" typeUri="http://example.org/ns#Tag">
+        <RestrictTo>
+          
+        </RestrictTo>
+      </SourceDataset>
+        <TargetDataset dataSource="foodrecipes" var="b" typeUri="http://example.org/ns#Tag">
+        <RestrictTo>
+          
+        </RestrictTo>
+      </TargetDataset>
+        <LinkageRule linkType="&lt;http://www.w3.org/2002/07/owl#sameAs&gt;">
+        <Compare id="equality1" required="false" weight="1" metric="equality" threshold="0.0" indexing="true">
+            <TransformInput id="removeDuplicateChars1" function="regexReplace">
+        <TransformInput id="rewritePhtoF1" function="replace">
+        <TransformInput id="rewriteTtoI1" function="replace">
+        <TransformInput id="normalizePluralSingular1" function="regexReplace">
+        <TransformInput id="removeSpecialChars1" function="removeSpecialChars">
+        <TransformInput id="normalizeChars1" function="normalizeChars">
+        <TransformInput id="lowerCase" function="lowerCase">
+        <Input id="sourcePath1" path="/&lt;http://www.w3.org/2000/01/rdf-schema#label&gt;"/>
+        
+      </TransformInput>
+        
+      </TransformInput>
+        
+      </TransformInput>
+        <Param name="regex" xml:space="preserve"><![CDATA[(es|s|ves|ve|f|e)$]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput>
+        <Param name="search" xml:space="preserve"><![CDATA[y]]></Param><Param name="replace" xml:space="preserve"><![CDATA[i]]></Param>
+      </TransformInput>
+        <Param name="search" xml:space="preserve"><![CDATA[ph]]></Param><Param name="replace" xml:space="preserve"><![CDATA[f]]></Param>
+      </TransformInput>
+        <Param name="regex" xml:space="preserve"><![CDATA[(?<=a)([a]{1,})|(?<=b)([b]{1,})|(?<=c)([c]{1,})|(?<=d)([d]{1,})|(?<=e)([e]{1,})|(?<=f)([f]{1,})|(?<=g)([g]{1,})|(?<=h)([h]{1,})|(?<=i)([i]{1,})|(?<=j)([j]{1,})|(?<=k)([k]{1,})|(?<=l)([l]{1,})|(?<=m)([m]{1,})|(?<=n)([n]{1,})|(?<=o)([o]{1,})|(?<=p)([p]{1,})|(?<=q)([q]{1,})|(?<=r)([r]{1,})|(?<=s)([s]{1,})|(?<=t)([t]{1,})|(?<=u)([u]{1,})|(?<=v)([v]{1,})|(?<=w)([w]{1,})|(?<=x)([x]{1,})|(?<=y)([y]{1,})|(?<=z)([z]{1,})]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput><TransformInput id="removeDuplicateChars2" function="regexReplace">
+        <TransformInput id="rewritePhtoF2" function="replace">
+        <TransformInput id="rewriteTtoI2" function="replace">
+        <TransformInput id="normalizePluralSingular2" function="regexReplace">
+        <TransformInput id="removeSpecialChars2" function="removeSpecialChars">
+        <TransformInput id="normalizeChars" function="normalizeChars">
+        <TransformInput id="lowerCase2" function="lowerCase">
+        <Input id="targetPath1" path="/&lt;http://www.w3.org/2000/01/rdf-schema#label&gt;"/>
+        
+      </TransformInput>
+        
+      </TransformInput>
+        
+      </TransformInput>
+        <Param name="regex" xml:space="preserve"><![CDATA[(es|s|ves|ve|f|e)$]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput>
+        <Param name="search" xml:space="preserve"><![CDATA[y]]></Param><Param name="replace" xml:space="preserve"><![CDATA[i]]></Param>
+      </TransformInput>
+        <Param name="search" xml:space="preserve"><![CDATA[ph]]></Param><Param name="replace" xml:space="preserve"><![CDATA[f]]></Param>
+      </TransformInput>
+        <Param name="regex" xml:space="preserve"><![CDATA[(?<=a)([a]{1,})|(?<=b)([b]{1,})|(?<=c)([c]{1,})|(?<=d)([d]{1,})|(?<=e)([e]{1,})|(?<=f)([f]{1,})|(?<=g)([g]{1,})|(?<=h)([h]{1,})|(?<=i)([i]{1,})|(?<=j)([j]{1,})|(?<=k)([k]{1,})|(?<=l)([l]{1,})|(?<=m)([m]{1,})|(?<=n)([n]{1,})|(?<=o)([o]{1,})|(?<=p)([p]{1,})|(?<=q)([q]{1,})|(?<=r)([r]{1,})|(?<=s)([s]{1,})|(?<=t)([t]{1,})|(?<=u)([u]{1,})|(?<=v)([v]{1,})|(?<=w)([w]{1,})|(?<=x)([x]{1,})|(?<=y)([y]{1,})|(?<=z)([z]{1,})]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput>
+          </Compare>
+        <Filter limit="1"/>
+      </LinkageRule>
+        <Outputs>
+          <Output id="bbc-food-tags"></Output>
+        </Outputs>
+      </Interlink>
+        </Interlinks>
+        <Transforms>
+          
+        </Transforms>
+        <Outputs>
+          <Dataset id="bbc-food-tags" type="file" uriProperty=""><MetaData>
+        <Label></Label>
+        <Description></Description>
+        
+      </MetaData>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Triples]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[100]]></Param><Param name="file" xml:space="preserve"><![CDATA[bbc-food-tags.nt]]></Param><Param name="graph" xml:space="preserve"><![CDATA[]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+          </Dataset>
+        </Outputs>
+      </Silk>

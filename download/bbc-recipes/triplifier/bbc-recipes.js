@@ -19,6 +19,15 @@ function main() {
         '@id': IRI_BASE,
         '@graph': []
     };
+
+    const graphEntities = {
+        authors: {},
+        ingredients: {},
+        tags: {},
+        courses: {},
+        cusines: {},
+        recipes: {},
+    }
     
     items.forEach((item) => {
         const { page: { article, recipe, title } } = item;
@@ -26,28 +35,42 @@ function main() {
         const { cooking_time, prep_time, serves, keywords, ratings, nutrition_info, ingredients, collections, courses, cusine, diet_types } = recipe;
     
         const RECIPE_IRI = `${IRI_BASE}/recipe/${id}`;
+
+        const entities = {
+            authors: [buildAuthor(author)],
+            ingredients: buildIngredients(ingredients),
+            tags: buildTags(keywords),
+            courses: buildCourses(courses),
+            cusines: buildCusines([cusine]),
+        };
     
-        const jsonldRecipe = {
+        entities.recipes = [{
             '@id': RECIPE_IRI,
             type: 'Recipe',
             name: normalizeText(title),
             description,
             id,
-            author: buildAuthor(author),
             cooking_time: convertToMinutes(cooking_time),
             prep_time: convertToMinutes(prep_time),
             serves,
-            ingredients: buildRecipeIngredients(ingredients),
-            keywords: buildRecipeTags(keywords),
-            courses,
-            cusine,
-            ratings: buildAggregateRating(ratings, RECIPE_IRI),
-            nutrition: buildNutritionInformation(nutrition_info, RECIPE_IRI),
-            diet_types: buildDietTypes(diet_types, collections),
-        };
-    
-        jsonld["@graph"].push(jsonldRecipe);
+            ratings: buildRecipeAggregateRating(ratings, RECIPE_IRI),
+            nutrition_info: buildRecipeNutritionInformation(nutrition_info, RECIPE_IRI),
+            diet_types: buildRecipeDietTypes(diet_types, collections, jsonld['@context']),
+            author: extractIds(entities.authors),
+            ingredients: extractIds(entities.ingredients),
+            keywords: extractIds(entities.tags),
+            courses: extractIds(entities.courses),
+            cusine: extractIds(entities.cusines),
+        }];
+
+        saveNewEntities(entities, graphEntities);
     });
+
+    jsonld['@graph'].push(...buildClassDefinitions(jsonld['@context']));
+
+    Object.values(graphEntities).forEach((entity) => {
+        jsonld['@graph'].push(...Object.values(entity));
+    })
 
     fs.writeFileSync(OUTPUT_PATH, JSON.stringify(jsonld, null, 2));
 }
@@ -66,14 +89,14 @@ function buildJsonldContext() {
     return {
         "@language": "en",
         "type": "@type",
+        "Class": "http://www.w3.org/2002/07/owl#Class",
+        "NamedIndividual": "http://www.w3.org/2002/07/owl#NamedIndividual",
+        "QuantitativeValue": "http://purl.org/goodrelations/v1#QuantitativeValue",
         "Recipe": "http://schema.org/Recipe",
         "Person": "http://schema.org/Person",
-        "Ingredient": "http://example.org/ns#Ingredient",
-        "Tag": "http://example.org/ns#Tag",
         "ItemList": "http://schema.org/ItemList",
         "HowToDirection": "http://schema.org/HowToDirection",
         "AggregateRating": "http://schema.org/AggregateRating",
-        "NutritionInformation": "http://schema.org/NutritionInformation",
         "DiabeticDiet": "http://schema.org/DiabeticDiet",
         "GlutenFreeDiet": "http://schema.org/GlutenFreeDiet",
         "LowCalorieDiet": "http://schema.org/LowCalorieDiet",
@@ -82,10 +105,22 @@ function buildJsonldContext() {
         "LowSaltDiet": "http://schema.org/LowSaltDiet",
         "VeganDiet": "http://schema.org/VeganDiet",
         "VegetarianDiet": "http://schema.org/VegetarianDiet",
+        "NutritionInformation": "http://schema.org/NutritionInformation",
+        "Ingredient": "http://example.org/ns#Ingredient",
+        "Tag": "http://example.org/ns#Tag",
+        "Course": "http://example.org/ns#Course",
+        "Cusine": "http://example.org/ns#Cusine",
+        "Calories": "http://example.org/ns#Calories",
+        "ProteinContent": "http://example.org/ns#ProteinContent",
+        "CarbohydrateContent": "http://example.org/ns#CarbohydrateContent",
+        "SugarContent": "http://example.org/ns#SugarContent",
+        "FatContent": "http://example.org/ns#FatContent",
+        "SaturatedFatContent": "http://example.org/ns#SaturatedFatContent",
         "name": "http://schema.org/name",
         "description": "http://schema.org/description",
         "id": "http://schema.org/identifier",
         "label": "http://www.w3.org/2000/01/rdf-schema#label",
+        "subClassOf": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
         "author": "http://schema.org/contributor",
         "prep_time": { 
             "@id": "http://schema.org/prepTime",
@@ -104,6 +139,11 @@ function buildJsonldContext() {
             "@id":"http://schema.org/ratingValue",
             "@type": XSD_INTEGER
         },
+        "unit": "http://purl.org/goodrelations/v1#hasUnitOfMeasurement",
+        "quantity": {
+            "@id": "http://purl.org/goodrelations/v1#hasValueFloat",
+            "@type": XSD_FLOAT
+        },
         "ingredients": "http://schema.org/recipeIngredient",
         "keywords": "http://schema.org/keywords",
         "courses": "http://schema.org/recipeCategory",
@@ -113,31 +153,60 @@ function buildJsonldContext() {
             "@type": "http://schema.org/RestrictedDiet"
         },
         "nutrition_info": "http://schema.org/nutrition",
-        "kcal": { 
-            "@id":"http://schema.org/calories",
-            "@type": XSD_INTEGER
-        },
-        "carbohydrate": { 
-            "@id":"http://schema.org/carbohydrateContent",
-            "@type": XSD_FLOAT
-        },
-        "protein": { 
-            "@id":"http://schema.org/proteinContent",
-            "@type": XSD_FLOAT
-        },
-        "sugar": { 
-            "@id":"http://schema.org/sugarContent",
-            "@type": XSD_FLOAT
-        },
-        "fat": { 
-            "@id":"http://schema.org/fatContent",
-            "@type": XSD_FLOAT
-        },
-        "saturated_fat": { 
-            "@id":"http://schema.org/saturatedFatContent",
-            "@type": XSD_FLOAT
-        },
+        "kcal": "http://schema.org/calories",
+        "carbohydrate": "http://schema.org/carbohydrateContent",
+        "protein": "http://schema.org/proteinContent",
+        "sugar": "http://schema.org/sugarContent",
+        "fat": "http://schema.org/fatContent",
+        "saturated_fat": "http://schema.org/saturatedFatContent",
     };
+}
+
+function buildClassDefinitions(context) {
+    const QUANTITATIVE_VALUE = 'QuantitativeValue';
+    const NAMED_INDIVIDUAL = 'NamedIndividual';
+
+    const classes = [
+        { name: 'Ingredient', subClassOf: NAMED_INDIVIDUAL },
+        { name: 'Tag', subClassOf: NAMED_INDIVIDUAL },
+        { name: 'Course', subClassOf: NAMED_INDIVIDUAL },
+        { name: 'Cusine', subClassOf: NAMED_INDIVIDUAL },
+        { name: 'Calories', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'ProteinContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'CarbohydrateContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'FatContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'SaturatedFatContent', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'SugarContent', subClassOf: QUANTITATIVE_VALUE },
+    ];
+
+    return classes.map((classInfo) => buildClassDefinition(classInfo, context));
+}
+
+function buildClassDefinition({ name, subClassOf }, context) {
+    return {
+        '@id': `http://example.org/ns#${name}`,
+        type: 'Class',
+        label: name,
+        subClassOf: { '@id': context[subClassOf] },
+    }
+}
+
+function extractIds(items) {
+    return items.map((item) => ({ '@id': item['@id'] }));
+}
+
+function saveNewEntities(entities, saved) {
+    Object.keys(entities).forEach((key) => {
+        const items = entities[key];
+
+        items.forEach((item) => {
+            const id = item['@id'];
+
+            if (!saved[key][id]) {
+                saved[key][id] = item;
+            }
+        });
+    });
 }
 
 function convertToMinutes(duration) {
@@ -154,7 +223,7 @@ function convertToIri(text) {
     return lowercaseText.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/( )+/g, '-');
 }
 
-function buildAggregateRating(ratings, recipeIri) {
+function buildRecipeAggregateRating(ratings, recipeIri) {
     const RATING_TYPE = 'AggregateRating';
 
     return {
@@ -164,42 +233,55 @@ function buildAggregateRating(ratings, recipeIri) {
     }
 }
 
-function buildNutritionInformation(nutrition, recipeIri) {
+function buildRecipeNutritionInformation(nutrition, recipeIri) {
+    const NUTRITION_IRI = `${recipeIri}/nutrition`;
+
     const PROPERTY_MAPPING = {
         carbohydrate: 'carbohydrate',
         protein: 'protein',
         fat: 'fat',
-        'kcalcalories': 'kcal',
-        'addedsugar': 'sugar',
-        'saturatedfat': 'saturatedFat',
+        kcalcalories: 'kcal',
+        addedsuar: 'sugar',
+        saturatedfat: 'saturatedFat',
     };
 
-    const nutritionInfo = {
-        '@id': `${recipeIri}/nutrition`,
-        "type": "NutritionInformation",
-        "sugar": null,
-        "carbohydrate": null,
-        "kcal": null,
-        "protein": null,
-        "saturatedFat": null,
-        "fat": null,
+    const NUTRITION_MAPPING = {
+        kcal: { type: 'Calories', unit: 'kcal'},
+        sugar: { type: 'SugarContent', unit: 'g'},
+        protein: { type: 'ProteinContent', unit: 'g'},
+        carbohydrate: { type: 'CarbohydrateContent', unit: 'g'},
+        fat: { type: 'FatContent', unit: 'g'},
+        saturatedFat: { type: 'SaturatedFatContent', unit: 'g'},
     }
-    // "Added sugar 10g", "Carbohydrate 42g", "Kcal 457 calories", "Protein 33g", "Salt 1.8g", "Saturated fat 5g", "Fat 17g"
+
+    const nutritionInfo = {
+        '@id': NUTRITION_IRI,
+        type: 'NutritionInformation',
+    }
 
     nutrition.forEach((item) => {
-        const lowercase_item = item.toLowerCase(item);
-        const unit = lowercase_item.replace(/[0-9.g ]/g, '');
+        const nutritionKey = item.toLowerCase(item).replace(/[0-9.g ]/g, '');
 
-        if (PROPERTY_MAPPING[unit]) {
-            const propertyName = PROPERTY_MAPPING[unit];
-            nutritionInfo[propertyName] = parseNumber(item);
+        if (PROPERTY_MAPPING[nutritionKey]) {
+            const propertyName = PROPERTY_MAPPING[nutritionKey];
+
+
+            const { type, unit } = NUTRITION_MAPPING[propertyName];
+            const quantity = parseNumber(item);
+
+            nutritionInfo[propertyName] = {
+                "@id": `${NUTRITION_IRI}/${propertyName}`,
+                type,
+                quantity,
+                unit,
+            };
         }
     });
 
     return nutritionInfo;
 }
 
-function buildDietTypes(diets, collections) {
+function buildRecipeDietTypes(diets, collections, context) {
     const DIET_MAPPING = {
         vegetarian: 'VegetarianDiet',
         vegan: 'VeganDiet',
@@ -210,22 +292,16 @@ function buildDietTypes(diets, collections) {
         'dairy-free': 'LowLactoseDiet',
     }
 
-    const diet_enums = diets.map((diet) => DIET_MAPPING[diet.toLowerCase()])
+    const recipeDiets = diets.map((diet) => DIET_MAPPING[diet.toLowerCase()])
         .filter((diet) => diet); // removes unknown diet types
 
     collections.forEach((collection) => {
         if (collection.toLowerCase() === 'diabetes-friendly') {
-            diet_enums.push('DiabeticDiet');
+            recipeDiets.push('DiabeticDiet');
         }
     })
 
-    return diet_enums.map((diet) => {
-        const dietName = diet.replaceAll('Diet', '');
-        return {
-            '@id': `${IRI_BASE}/diets/${dietName}`,
-            type: diet,
-        }
-    });
+    return recipeDiets.map((diet) => ({ '@id': context[diet] }));
 }
 
 function buildAuthor(name) {
@@ -253,20 +329,30 @@ function buildLabeledItems(items, category, type) {
 
     items.forEach((item) => {
 
-        labeledItems.push({
-            "@id": `${ITEM_BASE_IRI}/${convertToIri(item)}`,
-            type,
-            label: item,
-        });
+        if (item) {
+            labeledItems.push({
+                "@id": `${ITEM_BASE_IRI}/${convertToIri(item)}`,
+                type,
+                label: item,
+            });
+        }
     })
 
     return labeledItems;
 }
 
-function buildRecipeIngredients(ingredients) {
+function buildIngredients(ingredients) {
     return buildLabeledItems(ingredients, 'ingredient', 'Ingredient');
 }
 
-function buildRecipeTags(keywords) {
+function buildTags(keywords) {
     return buildLabeledItems(keywords, 'tag', 'Tag');
+}
+
+function buildCusines(cusines) {
+    return buildLabeledItems(cusines, 'cusine', 'Cusine');
+}
+
+function buildCourses(courses) {
+    return buildLabeledItems(courses, 'course', 'Course');
 }
