@@ -46,10 +46,10 @@ function main() {
     fs.writeFileSync(OUTPUT_PATH, JSON.stringify(jsonld, null, 2));
 }
 
-function convertToIri(name) {
-    const lowercaseName = name.toLowerCase();
+function convertToIri(text) {
+    const lowercaseText = text.toLowerCase();
 
-    return lowercaseName.replaceAll(' ', '-').replaceAll(/[^a-zA-Z0-9-_]/g, '');
+    return lowercaseText.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/( )+/g, '-');
 }
 
 function buildJsonldContext() {

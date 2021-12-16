@@ -37,8 +37,8 @@ function main() {
             cooking_time: convertToMinutes(cooking_time),
             prep_time: convertToMinutes(prep_time),
             serves,
-            ingredients,
-            keywords,
+            ingredients: buildRecipeIngredients(ingredients),
+            keywords: buildRecipeTags(keywords),
             courses,
             cusine,
             ratings: buildAggregateRating(ratings, RECIPE_IRI),
@@ -68,6 +68,8 @@ function buildJsonldContext() {
         "type": "@type",
         "Recipe": "http://schema.org/Recipe",
         "Person": "http://schema.org/Person",
+        "Ingredient": "http://example.org/ns#Ingredient",
+        "Tag": "http://example.org/ns#Tag",
         "ItemList": "http://schema.org/ItemList",
         "HowToDirection": "http://schema.org/HowToDirection",
         "AggregateRating": "http://schema.org/AggregateRating",
@@ -83,6 +85,7 @@ function buildJsonldContext() {
         "name": "http://schema.org/name",
         "description": "http://schema.org/description",
         "id": "http://schema.org/identifier",
+        "label": "http://www.w3.org/2000/01/rdf-schema#label",
         "author": "http://schema.org/contributor",
         "prep_time": { 
             "@id": "http://schema.org/prepTime",
@@ -143,6 +146,12 @@ function convertToMinutes(duration) {
 
 function parseNumber(text) {
     return parseFloat(text.replace(/[^0-9.]/g, ''));
+}
+
+function convertToIri(text) {
+    const lowercaseText = text.toLowerCase();
+
+    return lowercaseText.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/( )+/g, '-');
 }
 
 function buildAggregateRating(ratings, recipeIri) {
@@ -235,4 +244,29 @@ function buildAuthor(name) {
         givenName: nameParts.length ? nameParts[0] : '',
         familyName: nameParts.length > 1 ? nameParts[nameParts.length - 1] : '',
     }
+}
+
+function buildLabeledItems(items, category, type) {
+    const ITEM_BASE_IRI = `${IRI_BASE}/${category}`;
+
+    const labeledItems = [];
+
+    items.forEach((item) => {
+
+        labeledItems.push({
+            "@id": `${ITEM_BASE_IRI}/${convertToIri(item)}`,
+            type,
+            label: item,
+        });
+    })
+
+    return labeledItems;
+}
+
+function buildRecipeIngredients(ingredients) {
+    return buildLabeledItems(ingredients, 'ingredient', 'Ingredient');
+}
+
+function buildRecipeTags(keywords) {
+    return buildLabeledItems(keywords, 'tag', 'Tag');
 }

@@ -39,8 +39,8 @@ function main() {
             submitted,
             author: buildAuthor(contributor_id),
             description: normalizeText(description),
-            ingredients: normalizeArray(ingredients),
-            tags: normalizeArray(tags),
+            ingredients: buildRecipeIngredients(normalizeArray(ingredients)),
+            tags: buildRecipeTags(normalizeArray(tags)),
             steps: buildRecipeInstructions(normalizeArray(steps), RECIPE_IRI),
             nutrition: buildNutritionInformation(nutrition, RECIPE_IRI)
         };
@@ -96,10 +96,10 @@ function normalizeArray(array) {
     return array ? array.map((item) => normalizeText(item)) : [];
 }
 
-function convertToIri(name) {
-    const lowercaseName = name.toLowerCase();
+function convertToIri(text) {
+    const lowercaseText = text.toLowerCase();
 
-    return lowercaseName.replaceAll(' ', '-').replaceAll(/[^a-zA-Z0-9-_]/g, '');
+    return lowercaseText.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/( )+/g, '-');
 }
 
 function buildJsonldContext() {
@@ -108,6 +108,8 @@ function buildJsonldContext() {
         "type": "@type",
         "Recipe": "http://schema.org/Recipe",
         "Person": "http://schema.org/Person",
+        "Ingredient": "http://example.org/ns#Ingredient",
+        "Tag": "http://example.org/ns#Tag",
         "NutritionInformation": "http://schema.org/NutritionInformation",
         "ItemList": "http://schema.org/ItemList",
         "HowToDirection": "http://schema.org/HowToDirection",
@@ -117,6 +119,7 @@ function buildJsonldContext() {
             "@id":"http://schema.org/identifier",
             "@type": XSD_INTEGER
         },
+        "label": "http://www.w3.org/2000/01/rdf-schema#label",
         "minutes": { 
             "@id": "http://schema.org/totalTime",
             "@type": OWL_MINUTES
@@ -209,4 +212,29 @@ function buildAuthor(id) {
         type: AUTHOR_TYPE,
         id,
     }
+}
+
+function buildLabeledItems(items, category, type) {
+    const ITEM_BASE_IRI = `${IRI_BASE}/${category}`;
+
+    const labeledItems = [];
+
+    items.forEach((item) => {
+
+        labeledItems.push({
+            "@id": `${ITEM_BASE_IRI}/${convertToIri(item)}`,
+            type,
+            label: item,
+        });
+    })
+
+    return labeledItems;
+}
+
+function buildRecipeIngredients(ingredients) {
+    return buildLabeledItems(ingredients, 'ingredient', 'Ingredient');
+}
+
+function buildRecipeTags(keywords) {
+    return buildLabeledItems(keywords, 'tag', 'Tag');
 }
