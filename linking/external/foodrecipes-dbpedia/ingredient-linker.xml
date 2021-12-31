@@ -1,0 +1,101 @@
+<Silk>
+        <Prefixes>
+      <Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/><Prefix id="dbo" namespace="http://dbpedia.org/ontology/"/><Prefix id="dbp" namespace="http://dbpedia.org/property/"/><Prefix id="gr" namespace="http://purl.org/goodrelations/v1#"/><Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/><Prefix id="skos" namespace="http://www.w3.org/2004/02/skos/core#"/><Prefix id="schema" namespace="http://schema.org/"/><Prefix id="ex" namespace="http://example.org/ns#"/><Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#"/>
+    </Prefixes>
+        <DataSources>
+          <Dataset id="foodrecipes" type="file" uriProperty=""><MetaData>
+        <Label></Label>
+        <Description></Description>
+        
+      </MetaData>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[foodrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/graphs/foodRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+          </Dataset><Dataset id="dbpedia" type="sparqlEndpoint" uriProperty=""><MetaData>
+        <Label></Label>
+        <Description></Description>
+        
+      </MetaData>
+            <Param name="pageSize" xml:space="preserve"><![CDATA[1000]]></Param><Param name="clearGraphBeforeExecution" xml:space="preserve"><![CDATA[true]]></Param><Param name="pauseTime" xml:space="preserve"><![CDATA[0]]></Param><Param name="retryCount" xml:space="preserve"><![CDATA[3]]></Param><Param name="endpointURI" xml:space="preserve"><![CDATA[https://dbpedia.org/sparql]]></Param><Param name="strategy" xml:space="preserve"><![CDATA[parallel]]></Param><Param name="retryPause" xml:space="preserve"><![CDATA[1000]]></Param><Param name="graph" xml:space="preserve"><![CDATA[]]></Param><Param name="queryParameters" xml:space="preserve"><![CDATA[]]></Param><Param name="login" xml:space="preserve"><![CDATA[]]></Param><Param name="useOrderBy" xml:space="preserve"><![CDATA[true]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param><Param name="password" xml:space="preserve"><![CDATA[]]></Param>
+          </Dataset>
+        </DataSources>
+        <Interlinks>
+          <Interlink id="food-dbpedia-ingredient-linker"><MetaData>
+        <Label></Label>
+        <Description></Description>
+        <Modified>2021-12-31T10:18:07.810Z</Modified>
+      </MetaData>
+        <SourceDataset dataSource="foodrecipes" var="a" typeUri="http://example.org/ns#Ingredient">
+        <RestrictTo>
+          
+        </RestrictTo>
+      </SourceDataset>
+        <TargetDataset dataSource="dbpedia" var="b" typeUri="">
+        <RestrictTo>
+          ?recipe &lt;http://dbpedia.org/ontology/ingredient&gt; ?a .
+        </RestrictTo>
+      </TargetDataset>
+        <LinkageRule linkType="&lt;http://www.w3.org/2002/07/owl#sameAs&gt;">
+        <Compare id="equality1" required="false" weight="1" metric="equality" threshold="0.0" indexing="true">
+            <TransformInput id="removeDuplicateChars1" function="regexReplace">
+        <TransformInput id="rewritePhtoF1" function="replace">
+        <TransformInput id="rewriteTtoI1" function="replace">
+        <TransformInput id="normalizePluralSingular1" function="regexReplace">
+        <TransformInput id="removeSpecialChars1" function="removeSpecialChars">
+        <TransformInput id="normalizeChars1" function="normalizeChars">
+        <TransformInput id="lowerCase" function="lowerCase">
+        <Input id="sourcePath1" path="/&lt;http://www.w3.org/2000/01/rdf-schema#label&gt;"/>
+        
+      </TransformInput>
+        
+      </TransformInput>
+        
+      </TransformInput>
+        <Param name="regex" xml:space="preserve"><![CDATA[(es|s|ves|ve|f|e)$]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput>
+        <Param name="search" xml:space="preserve"><![CDATA[y]]></Param><Param name="replace" xml:space="preserve"><![CDATA[i]]></Param>
+      </TransformInput>
+        <Param name="search" xml:space="preserve"><![CDATA[ph]]></Param><Param name="replace" xml:space="preserve"><![CDATA[f]]></Param>
+      </TransformInput>
+        <Param name="regex" xml:space="preserve"><![CDATA[(?<=a)([a]{1,})|(?<=b)([b]{1,})|(?<=c)([c]{1,})|(?<=d)([d]{1,})|(?<=e)([e]{1,})|(?<=f)([f]{1,})|(?<=g)([g]{1,})|(?<=h)([h]{1,})|(?<=i)([i]{1,})|(?<=j)([j]{1,})|(?<=k)([k]{1,})|(?<=l)([l]{1,})|(?<=m)([m]{1,})|(?<=n)([n]{1,})|(?<=o)([o]{1,})|(?<=p)([p]{1,})|(?<=q)([q]{1,})|(?<=r)([r]{1,})|(?<=s)([s]{1,})|(?<=t)([t]{1,})|(?<=u)([u]{1,})|(?<=v)([v]{1,})|(?<=w)([w]{1,})|(?<=x)([x]{1,})|(?<=y)([y]{1,})|(?<=z)([z]{1,})]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput><TransformInput id="removeDuplicateChars2" function="regexReplace">
+        <TransformInput id="rewritePhtoF2" function="replace">
+        <TransformInput id="rewriteTtoI2" function="replace">
+        <TransformInput id="normalizePluralSingular2" function="regexReplace">
+        <TransformInput id="removeSpecialChars2" function="removeSpecialChars">
+        <TransformInput id="normalizeChars" function="normalizeChars">
+        <TransformInput id="lowerCase2" function="lowerCase">
+        <Input id="targetPath1" path="/&lt;http://www.w3.org/2000/01/rdf-schema#label&gt;"/>
+        
+      </TransformInput>
+        
+      </TransformInput>
+        
+      </TransformInput>
+        <Param name="regex" xml:space="preserve"><![CDATA[(es|s|ves|ve|f|e)$]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput>
+        <Param name="search" xml:space="preserve"><![CDATA[y]]></Param><Param name="replace" xml:space="preserve"><![CDATA[i]]></Param>
+      </TransformInput>
+        <Param name="search" xml:space="preserve"><![CDATA[ph]]></Param><Param name="replace" xml:space="preserve"><![CDATA[f]]></Param>
+      </TransformInput>
+        <Param name="regex" xml:space="preserve"><![CDATA[(?<=a)([a]{1,})|(?<=b)([b]{1,})|(?<=c)([c]{1,})|(?<=d)([d]{1,})|(?<=e)([e]{1,})|(?<=f)([f]{1,})|(?<=g)([g]{1,})|(?<=h)([h]{1,})|(?<=i)([i]{1,})|(?<=j)([j]{1,})|(?<=k)([k]{1,})|(?<=l)([l]{1,})|(?<=m)([m]{1,})|(?<=n)([n]{1,})|(?<=o)([o]{1,})|(?<=p)([p]{1,})|(?<=q)([q]{1,})|(?<=r)([r]{1,})|(?<=s)([s]{1,})|(?<=t)([t]{1,})|(?<=u)([u]{1,})|(?<=v)([v]{1,})|(?<=w)([w]{1,})|(?<=x)([x]{1,})|(?<=y)([y]{1,})|(?<=z)([z]{1,})]]></Param><Param name="replace" xml:space="preserve"><![CDATA[]]></Param>
+      </TransformInput>
+          </Compare>
+        <Filter limit="1"/>
+      </LinkageRule>
+        <Outputs>
+          <Output id="food-dbpedia-ingredients"></Output>
+        </Outputs>
+      </Interlink>
+        </Interlinks>
+        <Transforms>
+          
+        </Transforms>
+        <Outputs>
+          <Dataset id="food-dbpedia-ingredients" type="file" uriProperty=""><MetaData>
+        <Label></Label>
+        <Description></Description>
+        
+      </MetaData>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Triples]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[100]]></Param><Param name="file" xml:space="preserve"><![CDATA[food-dbpedia-ingredients.nt]]></Param><Param name="graph" xml:space="preserve"><![CDATA[]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+          </Dataset>
+        </Outputs>
+      </Silk>
