@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const INPUT_PATH = `${__dirname}/../input/food-recipes.json`;
 const OUTPUT_PATH = `${__dirname}/../output/food-recipes.jsonld`;
-const IRI_BASE = 'http://example.org/graphs/foodRecipes';
+const IRI_BASE = 'http://example.org/resource/dataset/foodRecipes';
 
 const XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
 const XSD_FLOAT = 'http://www.w3.org/2001/XMLSchema#float';
@@ -42,7 +42,7 @@ function main() {
             ingredients: buildIngredients(normalizeArray(ingredients)),
             tags: buildTags(normalizeArray(tags)),
         };
-    
+
         entities.recipes = [{
             '@id': RECIPE_IRI,
             type: 'Recipe',

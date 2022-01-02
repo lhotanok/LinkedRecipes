@@ -1,8 +1,9 @@
+const { countReset } = require('console');
 const fs = require('fs');
 
 const INPUT_PATH = `${__dirname}/../input/all-recipes.json`;
 const OUTPUT_PATH = `${__dirname}/../output/all-recipes.jsonld`;
-const IRI_BASE = 'http://example.org/graphs/allRecipes';
+const IRI_BASE = 'http://example.org/resource/dataset/allRecipes';
 
 const XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
 const XSD_FLOAT = 'http://www.w3.org/2001/XMLSchema#float';
@@ -27,15 +28,16 @@ function main() {
     
     recipes.forEach((recipe) => {
         const { name, prepTime, cookTime, totalTime, url, directions, ingredients, nutrition, rating, servings, reviews } = recipe;
-
-        // console.log(`prep: ${prepTime}, cook: ${cookTime}, total: ${totalTime}`);
     
         const RECIPE_IRI = `${IRI_BASE}/recipe/${convertToIri(name)}`;
 
+        const parsedIngredients = parseIngredients(ingredients);
+        const generalIngredients = buildIngredients(parsedIngredients);
+
         const entities = {
-            ingredients: buildIngredients(ingredients),
+            ingredients: generalIngredients,
         };
-    
+
         entities.recipes = [{
             '@id': RECIPE_IRI,
             type: 'Recipe',
@@ -45,7 +47,7 @@ function main() {
             prepTime: parseMinutes(prepTime),
             cookTime: parseMinutes(cookTime),
             totalTime: parseMinutes(totalTime),
-            ingredients: extractIds(entities.ingredients),
+            ingredients: buildRecipeIngredients(parsedIngredients, RECIPE_IRI),
             rating: buildAggregateRating(rating, reviews, RECIPE_IRI),
             directions: buildRecipeInstructions(directions, RECIPE_IRI),
             nutrition: buildRecipeNutritionInformation(nutrition, RECIPE_IRI),
@@ -54,7 +56,10 @@ function main() {
         saveNewEntities(entities, graphEntities);
     });
 
-    jsonld['@graph'].push(...buildClassDefinitions(jsonld['@context']));
+    jsonld['@graph'].push(
+        ...buildClassDefinitions(jsonld['@context']),
+        ...buildPropertyDefinitions(jsonld['@context']),
+        );
 
     Object.values(graphEntities).forEach((entity) => {
         jsonld['@graph'].push(...Object.values(entity));
@@ -74,13 +79,16 @@ function buildJsonldContext() {
         "@language": "en",
         "type": "@type",
         "Class": "http://www.w3.org/2002/07/owl#Class",
+        "Property": "http://www.w3.org/2002/07/owl#ObjectProperty",
         "Recipe": "http://schema.org/Recipe",
         "NutritionInformation": "http://schema.org/NutritionInformation",
         "ItemList": "http://schema.org/ItemList",
         "HowToDirection": "http://schema.org/HowToDirection",
+        "NamedIndividual": "http://www.w3.org/2002/07/owl#NamedIndividual",
         "QuantitativeValue": "http://purl.org/goodrelations/v1#QuantitativeValue",
         "AggregateRating": "http://schema.org/AggregateRating",
         "Ingredient": "http://example.org/ns#Ingredient",
+        "RecipeIngredient": "http://example.org/ns#RecipeIngredient",
         "Calories": "http://example.org/ns#Calories",
         "ProteinContent": "http://example.org/ns#ProteinContent",
         "CarbohydrateContent": "http://example.org/ns#CarbohydrateContent",
@@ -109,6 +117,7 @@ function buildJsonldContext() {
             "@type": OWL_MINUTES
         },
         "ingredients": "http://schema.org/recipeIngredient",
+        "amount": "http://purl.org/goodrelations/v1#hasEligibleQuantity",
         "unit": "http://purl.org/goodrelations/v1#hasUnitOfMeasurement",
         "quantity": {
             "@id": "http://purl.org/goodrelations/v1#hasValueFloat",
@@ -146,9 +155,11 @@ function buildJsonldContext() {
 
 function buildClassDefinitions(context) {
     const QUANTITATIVE_VALUE = 'QuantitativeValue';
+    const NAMED_INDIVIDUAL = 'NamedIndividual';
 
     const classes = [
-        { name: 'Ingredient', subClassOf: QUANTITATIVE_VALUE },
+        { name: 'Ingredient', subClassOf: NAMED_INDIVIDUAL },
+        { name: 'RecipeIngredient', subClassOf: NAMED_INDIVIDUAL },
         { name: 'Calories', subClassOf: QUANTITATIVE_VALUE },
         { name: 'ProteinContent', subClassOf: QUANTITATIVE_VALUE },
         { name: 'CarbohydrateContent', subClassOf: QUANTITATIVE_VALUE },
@@ -170,8 +181,26 @@ function buildClassDefinition(classInfo, context) {
     }
 }
 
-function extractIds(items) {
-    return items.map((item) => ({ '@id': item['@id'] }));
+function buildPropertyDefinitions(context) {
+    const RECIPE_INGREDIENT = 'RecipeIngredient';
+    const INGREDIENT = "Ingredient"
+
+    const properties = [
+        { name: 'ingredient', domain: RECIPE_INGREDIENT, range: INGREDIENT },
+    ];
+
+    return properties.map((propertyInfo) => buildPropertyDefinition(propertyInfo, context));
+}
+
+function buildPropertyDefinition(propertyInfo, context) {
+    const { name, domain, range } = propertyInfo;
+    return {
+        '@id': `http://example.org/ns#${name}`,
+        type: 'Property',
+        label: name,
+        domain: { '@id': context[domain] },
+        range: { '@id': context[range] },
+    }
 }
 
 function saveNewEntities(entities, saved) {
@@ -275,9 +304,7 @@ function buildRecipeInstructions(directions, recipeIri) {
     return recipeInstructions;
 }
 
-function buildIngredients(ingredients) {
-    const INGREDIENT_BASE_IRI = `${IRI_BASE}/ingredient`;
-
+function parseIngredients(ingredients) {
     const recipeIngredients = [];
 
     ingredients.forEach((ingredient) => {
@@ -302,13 +329,57 @@ function buildIngredients(ingredients) {
         const idName = parsedName.length <= parsedAltName.length ? parsedName : parsedAltName;
 
         recipeIngredients.push({
+            idName,
+            altName,
+            name,
+            quantity: parseFloat(parsedQuantity),
+            unit,
+        });
+    })
+
+    return recipeIngredients;
+}
+
+function buildIngredients(parsedIngredients) {
+    const INGREDIENT_BASE_IRI = `${IRI_BASE}/ingredient`;
+
+    const ingredients = [];
+
+    parsedIngredients.forEach((ingredient) => {
+        const { name, idName, altName, unit, quantity } = ingredient;
+
+        ingredients.push({
             "@id": `${INGREDIENT_BASE_IRI}/${convertToIri(idName)}`,
             type: 'Ingredient',
             prefLabel: idName,
             altLabel: altName,
             description: name,
-            quantity: parseFloat(parsedQuantity),
-            unit,
+        });
+    })
+
+    return ingredients;
+}
+
+function buildRecipeIngredients(parsedIngredients, recipeIri) {
+    const INGREDIENT_BASE_IRI = `${IRI_BASE}/ingredient`;
+    const RECIPE_INGREDIENT_BASE_IRI = `${recipeIri}/ingredient`;
+
+    const recipeIngredients = [];
+
+    parsedIngredients.forEach((ingredient) => {
+        const { idName, unit, quantity } = ingredient;
+
+        const ingredient_iri_suffix = convertToIri(idName);
+
+        recipeIngredients.push({
+            "@id": `${RECIPE_INGREDIENT_BASE_IRI}/${ingredient_iri_suffix}`,
+            type: 'RecipeIngredient',
+            ingredient: `${INGREDIENT_BASE_IRI}/${ingredient_iri_suffix}`,
+            amount: {
+                "@id": `${RECIPE_INGREDIENT_BASE_IRI}/${ingredient_iri_suffix}/amount`,
+                quantity,
+                unit,
+            }
         });
     })
 

@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const INPUT_PATH = `${__dirname}/../input/bbc-recipes.json`;
 const OUTPUT_PATH = `${__dirname}/../output/bbc-recipes.jsonld`;
-const IRI_BASE = 'http://example.org/graphs/bbcRecipes';
+const IRI_BASE = 'http://example.org/resource/dataset/bbcRecipes';
 
 const XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
 const XSD_FLOAT = 'http://www.w3.org/2001/XMLSchema#float';

@@ -8,7 +8,7 @@
         <Description></Description>
         
       </MetaData>
-            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[foodrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/graphs/foodRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[foodrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/resource/dataset/foodRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
           </Dataset><Dataset id="dbpedia" type="sparqlEndpoint" uriProperty=""><MetaData>
         <Label></Label>
         <Description></Description>
@@ -21,7 +21,7 @@
           <Interlink id="food-dbpedia-ingredient-linker"><MetaData>
         <Label></Label>
         <Description></Description>
-        <Modified>2021-12-31T10:18:07.810Z</Modified>
+        <Modified>2022-01-02T12:17:11.807Z</Modified>
       </MetaData>
         <SourceDataset dataSource="foodrecipes" var="a" typeUri="http://example.org/ns#Ingredient">
         <RestrictTo>

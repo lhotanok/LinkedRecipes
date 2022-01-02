@@ -1,6 +1,6 @@
 <Silk>
         <Prefixes>
-      <Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/><Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#"/><Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/><Prefix id="schema" namespace="http://schema.org/"/><Prefix id="ex" namespace="http://example.org/ns#"/>
+      <Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/><Prefix id="dbo" namespace="http://dbpedia.org/ontology/"/><Prefix id="dbp" namespace="http://dbpedia.org/property/"/><Prefix id="gr" namespace="http://purl.org/goodrelations/v1#"/><Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/><Prefix id="skos" namespace="http://www.w3.org/2004/02/skos/core#"/><Prefix id="schema" namespace="http://schema.org/"/><Prefix id="ex" namespace="http://example.org/ns#"/><Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#"/>
     </Prefixes>
         <DataSources>
           <Dataset id="bbcrecipes" type="file" uriProperty=""><MetaData>
@@ -8,20 +8,20 @@
         <Description></Description>
         
       </MetaData>
-            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[bbcrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/graphs/bbcRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[bbcrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/resource/dataset/bbcRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
           </Dataset><Dataset id="foodrecipes" type="file" uriProperty=""><MetaData>
         <Label></Label>
         <Description></Description>
         
       </MetaData>
-            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[foodrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/graphs/foodRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
+            <Param name="format" xml:space="preserve"><![CDATA[N-Quads]]></Param><Param name="maxReadSize" xml:space="preserve"><![CDATA[200]]></Param><Param name="file" xml:space="preserve"><![CDATA[foodrecipes.nq]]></Param><Param name="graph" xml:space="preserve"><![CDATA[http://example.org/resource/dataset/foodRecipes]]></Param><Param name="entityList" xml:space="preserve"><![CDATA[]]></Param>
           </Dataset>
         </DataSources>
         <Interlinks>
           <Interlink id="bbc-food-tag-linker"><MetaData>
         <Label></Label>
         <Description></Description>
-        <Modified>2021-12-16T13:03:41.552Z</Modified>
+        <Modified>2022-01-02T12:26:05.920Z</Modified>
       </MetaData>
         <SourceDataset dataSource="bbcrecipes" var="a" typeUri="http://example.org/ns#Tag">
         <RestrictTo>

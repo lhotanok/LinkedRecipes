@@ -11,9 +11,9 @@ Dataset link: https://raw.githubusercontent.com/mneedham/bbcgoodfood/master/stre
 https://www.allrecipes.com/
 Dataset generated from: https://apify.com/dtrungtin/allrecipes-scraper
 
-I included dataset files directly in the source directory as I had to edit them before use.
-E.g. I reduced dataset sizes to avoid exceeding GitHub 100 MB limit per file and Silk memory
-limit. I extracted each 5th recipe from BBC recipes dataset and each 20th from Kaggle dataset.
+I had to edit the downloaded datasets before use. E.g. I reduced dataset sizes to avoid exceeding
+GitHub 100 MB limit per file and Silk memory limit. I extracted each 5th recipe from BBC recipes
+dataset and each 20th from Kaggle dataset.
 
 I defined jsonld context for all datasets as the original format was json for BBC Recipes and All Recipes.
 Kaggle csv dataset was converted to json as it's more suitable format with respect to arrays previously saved
