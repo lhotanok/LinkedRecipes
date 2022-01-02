@@ -1,0 +1,19 @@
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+:BBCRecipes_FoodRecipes a void:Linkset;
+    void:subjectsTarget :BBCRecipes;
+    void:objectsTarget :FoodRecipes;
+    void:linkPredicate owl:sameAs;
+    .
+
+:BBCRecipes a void:Dataset;
+    dcterms:source <http://example.org/resource/dataset/bbcRecipes>;
+    void:sparqlEndpoint <http://example.org/resource/dataset/bbcRecipes/sparql>;
+    .
+
+:FoodRecipes a void:Dataset;
+    dcterms:source <http://example.org/resource/dataset/foodRecipes>;
+    void:sparqlEndpoint <http://example.org/resource/dataset/foodRecipes/sparql>;
+    .
