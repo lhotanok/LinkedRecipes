@@ -10,7 +10,7 @@
 :FoodRecipes a void:Dataset;
     dcterms:title "Food recipes";
     dcterms:description "RDF data extracted from Food recipes"@en;
-    dcterms:publisher :Kristyna_Lhotanova;
+    dcterms:publisher :KristynaLhotanova;
     dcterms:source <http://example.org/resource/dataset/foodRecipes>;
     dcterms:modified "2022-01-02"^^xsd:date;
     dcterms:licence <http://creativecommons.org/publicdomain/zero/1.0/>;
@@ -31,7 +31,7 @@
     void:uriSpace "http://example.org/resource/dataset/foodRecipes/";
     void:vocabulary <http://schema.org/>;
     void:vocabulary <http://purl.org/goodrelations/v1>;
-    void:vocabulary <http://www.w3.org/2002/07/owl>
+    void:vocabulary <http://www.w3.org/2002/07/owl>;
     void:classPartition [ void:class schema:Recipe; ];
     void:classPartition [ void:class schema:Person; ];
     void:classPartition [ void:class schema:NutritionInformation; ];
@@ -70,9 +70,9 @@
     void:propertyPartition [ void:property gr:hasValueFloat; ];
     .
 
-:Kristyna_Lhotanova a foaf:Person;
-    foaf:givenName "Kristýna"@cs
-    foaf:familyName "Lhoťanová"@cs
+:KristynaLhotanova a foaf:Person;
+    foaf:givenName "Kristýna"@cs;
+    foaf:familyName "Lhoťanová"@cs;
     foaf:homepage <http://github.com/lhotanok>;
     foaf:mbox <mailto:kristyna.lhotanova@gmail.com>;
     .
