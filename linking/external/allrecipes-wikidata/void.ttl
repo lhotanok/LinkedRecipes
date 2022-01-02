@@ -1,0 +1,19 @@
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+:AllRecipes_Wikidata a void:Linkset;
+    void:subjectsTarget :AllRecipes;
+    void:objectsTarget :Wikidata;
+    void:linkPredicate owl:sameAs;
+    .
+
+:AllRecipes a void:Dataset;
+    dcterms:source <http://example.org/resource/dataset/allRecipes>;
+    void:sparqlEndpoint <http://example.org/resource/dataset/allRecipes/sparql>;
+    .
+
+:Wikidata a void:Dataset;
+    dcterms:source <http://www.wikidata.org/wiki/Q52>;
+    void:sparqlEndpoint <http://query.wikidata.org/sparql>;
+    .
