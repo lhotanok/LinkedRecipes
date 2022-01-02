@@ -4,7 +4,7 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix ex: <http://example.org/ns#> .
 @prefix schema: <http://schema.org/> .
-@prefix gr: <http://purl.org/goodrelations/v1#>
+@prefix gr: <http://purl.org/goodrelations/v1#> .
 @prefix : <#> .
 
 :AllRecipes a void:Dataset;
@@ -24,12 +24,14 @@
     void:exampleResource <http://example.org/resource/dataset/allRecipes/recipe/grilled-chicken-salad-sandwich>;
     void:exampleResource <http://example.org/resource/dataset/allRecipes/recipe/grilled-chicken-salad-sandwich/rating>;
     void:exampleResource <http://example.org/resource/dataset/allRecipes/recipe/grilled-chicken-salad-sandwich/directions>;
+    void:exampleResource <http://example.org/resource/dataset/allRecipes/recipe/grilled-chicken-salad-sandwich/directions#step1>;
     void:exampleResource <http://example.org/resource/dataset/allRecipes/recipe/grilled-chicken-salad-sandwich/nutrition>;
     void:exampleResource <http://example.org/resource/dataset/allRecipes/recipe/grilled-chicken-salad-sandwich/nutrition/calories>;
     void:uriSpace "http://example.org/resource/dataset/allRecipes/";
     void:vocabulary <http://schema.org/>;
-    void:vocabulary <http://www.w3.org/TR/swbp-skos-core-spec/>
-    void:vocabulary <http://purl.org/goodrelations/v1>
+    void:vocabulary <http://purl.org/goodrelations/v1>;
+    void:vocabulary <http://www.w3.org/2002/07/owl>
+    void:vocabulary <http://www.w3.org/TR/swbp-skos-core-spec/>;
     void:classPartition [ void:class schema:Recipe; ];
     void:classPartition [ void:class schema:NutritionInformation; ];
     void:classPartition [ void:class schema:ItemList; ];
@@ -37,6 +39,7 @@
     void:classPartition [ void:class schema:AggregateRating; ];
     void:classPartition [ void:class gr:QuantitativeValue; ];
     void:classPartition [ void:class ex:Ingredient; ];
+    void:classPartition [ void:class ex:RecipeIngredient; ];
     void:classPartition [ void:class ex:Calories; ];
     void:classPartition [ void:class ex:ProteinContent; ];
     void:classPartition [ void:class ex:CarbohydrateContent; ];
@@ -61,13 +64,18 @@
     void:propertyPartition [ void:property schema:sodiumContent; ];
     void:propertyPartition [ void:property schema:recipeYield; ];
     void:propertyPartition [ void:property schema:recipeInstructions; ];
+    void:propertyPartition [ void:property schema:itemListElement; ];
     void:propertyPartition [ void:property schema:position; ];
     void:propertyPartition [ void:property schema:text; ];
+    void:propertyPartition [ void:property gr:hasEligibleQuantity; ];
     void:propertyPartition [ void:property gr:hasUnitOfMeasurement; ];
     void:propertyPartition [ void:property gr:hasValueFloat; ];
+    void:propertyPartition [ void:property ex:ingredient; ];
     .
+
 :Kristyna_Lhotanova a foaf:Person;
     foaf:givenName "Kristýna"@cs
     foaf:familyName "Lhoťanová"@cs
     foaf:homepage <http://github.com/lhotanok>;
     foaf:mbox <mailto:kristyna.lhotanova@gmail.com>;
+    .

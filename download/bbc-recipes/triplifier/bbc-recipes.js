@@ -94,8 +94,6 @@ function buildJsonldContext() {
         "QuantitativeValue": "http://purl.org/goodrelations/v1#QuantitativeValue",
         "Recipe": "http://schema.org/Recipe",
         "Person": "http://schema.org/Person",
-        "ItemList": "http://schema.org/ItemList",
-        "HowToDirection": "http://schema.org/HowToDirection",
         "AggregateRating": "http://schema.org/AggregateRating",
         "DiabeticDiet": "http://schema.org/DiabeticDiet",
         "GlutenFreeDiet": "http://schema.org/GlutenFreeDiet",

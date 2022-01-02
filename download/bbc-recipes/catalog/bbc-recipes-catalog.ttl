@@ -1,0 +1,89 @@
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix ex: <http://example.org/ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix gr: <http://purl.org/goodrelations/v1#> .
+@prefix : <#> .
+
+:BBCRecipes a void:Dataset;
+    dcterms:title "BBC Recipes";
+    dcterms:description "RDF data extracted from BBC Good Food recipes"@en;
+    dcterms:publisher :Kristyna_Lhotanova;
+    dcterms:source <http://example.org/resource/dataset/bbcRecipes>;
+    dcterms:modified "2022-01-02"^^xsd:date;
+    dcterms:licence <http://creativecommons.org/publicdomain/zero/1.0/>;
+    dcterms:subject <http://dbpedia.org/resource/Recipe>;
+    void:feature <http://www.w3.org/ns/formats/JSON-LD>;
+    void:feature <http://www.w3.org/ns/formats/N-Quads>;
+    void:sparqlEndpoint <http://example.org/resource/dataset/bbcRecipes/sparql>;
+    void:dataDump <http://github.com/lhotanok/LinkedRecipes/blob/main/download/bbc-recipes/output/bbc-recipes.jsonld>;
+    void:dataDump <http://github.com/lhotanok/LinkedRecipes/blob/main/download/bbc-recipes/output/bbc-recipes.nq>;
+    void:exampleResource <http://example.org/resource/dataset/bbcRecipes/ingredient/chicken-thigh>; 
+    void:exampleResource <http://example.org/resource/dataset/bbcRecipes/tag/take-away>;
+    void:exampleResource <http://example.org/resource/dataset/bbcRecipes/course/main-course>;
+    void:exampleResource <http://example.org/resource/dataset/bbcRecipes/cusine/indian>;
+    void:exampleResource <http://example.org/resource/dataset/bbcRecipes/author/roopa-gulati>;
+    void:exampleResource <http://example.org/resource/dataset/bbcRecipes/recipe/96899>;
+    void:exampleResource <http://example.org/resource/dataset/bbcRecipes/recipe/96899/rating>;
+    void:exampleResource <http://example.org/resource/dataset/bbcRecipes/recipe/96899/nutrition>;
+    void:exampleResource <http://example.org/resource/dataset/bbcRecipes/recipe/96899/nutrition/kcal>;
+    void:uriSpace "http://example.org/resource/dataset/bbcRecipes/";
+    void:vocabulary <http://schema.org/>;
+    void:vocabulary <http://purl.org/goodrelations/v1>;
+    void:vocabulary <http://www.w3.org/2002/07/owl>
+    void:classPartition [ void:class schema:Recipe; ];
+    void:classPartition [ void:class schema:Person; ];
+    void:classPartition [ void:class schema:NutritionInformation; ];
+    void:classPartition [ void:class schema:ItemList; ];
+    void:classPartition [ void:class schema:AggregateRating; ];
+    void:classPartition [ void:class schema:DiabeticDiet; ];
+    void:classPartition [ void:class schema:GlutenFreeDiet; ];
+    void:classPartition [ void:class schema:LowCalorieDiet; ];
+    void:classPartition [ void:class schema:LowFatDiet; ];
+    void:classPartition [ void:class schema:LowLactoseDiet; ];
+    void:classPartition [ void:class schema:LowSaltDiet; ];
+    void:classPartition [ void:class schema:VeganDiet; ];
+    void:classPartition [ void:class schema:VegetarianDiet; ];
+    void:classPartition [ void:class gr:QuantitativeValue; ];
+    void:classPartition [ void:class ex:Ingredient; ];
+    void:classPartition [ void:class ex:Tag; ];
+    void:classPartition [ void:class ex:Course; ];
+    void:classPartition [ void:class ex:Cusine; ];
+    void:classPartition [ void:class ex:Calories; ];
+    void:classPartition [ void:class ex:ProteinContent; ];
+    void:classPartition [ void:class ex:CarbohydrateContent; ];
+    void:classPartition [ void:class ex:FatContent; ];
+    void:classPartition [ void:class ex:SugarContent; ];
+    void:classPartition [ void:class ex:SaturatedFatContent; ];
+    void:propertyPartition [ void:property schema:name; ];
+    void:propertyPartition [ void:property schema:description; ];
+    void:propertyPartition [ void:property schema:contributor; ];
+    void:propertyPartition [ void:property schema:prepTime; ];
+    void:propertyPartition [ void:property schema:cookTime; ];
+    void:propertyPartition [ void:property schema:recipeIngredient; ];
+    void:propertyPartition [ void:property schema:aggregateRating; ];
+    void:propertyPartition [ void:property schema:ratingValue; ];
+    void:propertyPartition [ void:property schema:keywords; ];
+    void:propertyPartition [ void:property schema:recipeCategory; ];
+    void:propertyPartition [ void:property schema:recipeCuisine; ];
+    void:propertyPartition [ void:property schema:suitableForDiet; ];
+    void:propertyPartition [ void:property schema:nutrition; ];
+    void:propertyPartition [ void:property schema:calories; ];
+    void:propertyPartition [ void:property schema:proteinContent; ];
+    void:propertyPartition [ void:property schema:carbohydrateContent; ];
+    void:propertyPartition [ void:property schema:fatContent; ];
+    void:propertyPartition [ void:property schema:saturatedFatContent; ];
+    void:propertyPartition [ void:property schema:sugarContent; ];
+    void:propertyPartition [ void:property schema:recipeYield; ];
+    void:propertyPartition [ void:property gr:hasUnitOfMeasurement; ];
+    void:propertyPartition [ void:property gr:hasValueFloat; ];
+    .
+
+:Kristyna_Lhotanova a foaf:Person;
+    foaf:givenName "Kristýna"@cs
+    foaf:familyName "Lhoťanová"@cs
+    foaf:homepage <http://github.com/lhotanok>;
+    foaf:mbox <mailto:kristyna.lhotanova@gmail.com>;
+    .
