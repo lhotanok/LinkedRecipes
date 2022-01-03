@@ -118,6 +118,7 @@ function buildJsonldContext() {
         },
         "ingredients": "http://schema.org/recipeIngredient",
         "amount": "http://purl.org/goodrelations/v1#hasEligibleQuantity",
+        "ingredient": "http://example.org/ns#ingredient",
         "unit": "http://purl.org/goodrelations/v1#hasUnitOfMeasurement",
         "quantity": {
             "@id": "http://purl.org/goodrelations/v1#hasValueFloat",
@@ -374,7 +375,9 @@ function buildRecipeIngredients(parsedIngredients, recipeIri) {
         recipeIngredients.push({
             "@id": `${RECIPE_INGREDIENT_BASE_IRI}/${ingredient_iri_suffix}`,
             type: 'RecipeIngredient',
-            ingredient: `${INGREDIENT_BASE_IRI}/${ingredient_iri_suffix}`,
+            ingredient: {
+                "@id": `${INGREDIENT_BASE_IRI}/${ingredient_iri_suffix}`,
+            },
             amount: {
                 "@id": `${RECIPE_INGREDIENT_BASE_IRI}/${ingredient_iri_suffix}/amount`,
                 quantity,
