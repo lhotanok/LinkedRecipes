@@ -1,30 +1,32 @@
 package com.example.app.jena;
 
 import org.apache.jena.fuseki.main.FusekiServer;
-import org.apache.jena.graph.Graph;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.sparql.core.DatasetGraphCollection;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
-import org.apache.jena.sparql.graph.GraphFactory;
-import org.eclipse.rdf4j.repository.dataset.config.DatasetRepositoryFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.javatuples.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TriplestoreCreator {
     public static void initializeDatasets() {
-        List<String> recipeGraphs = new ArrayList<>();
-        recipeGraphs.add("all-recipes.jsonld");
-        recipeGraphs.add("bbc-recipes.jsonld");
-        recipeGraphs.add("food-recipes.jsonld");
+        var dataset = DatasetFactory.createGeneral();
 
+        List<Pair<String, String>> recipeGraphs = new ArrayList<>();
+        recipeGraphs.add(new Pair("all-recipes.jsonld", "<http://example.org/resource/dataset/allRecipes>"));
+        recipeGraphs.add(new Pair("bbc-recipes.jsonld", "<http://example.org/resource/dataset/bbcRecipes>"));
+        recipeGraphs.add(new Pair("food-recipes.jsonld", "<http://example.org/resource/dataset/foodRecipes>"));
 
-        Dataset mergedRecipeDatasets = DatasetFactory.createNamed(recipeGraphs);
+        for (var pair: recipeGraphs) {
+            Model model = ModelFactory.createDefaultModel();
+            model.read (pair.getValue0(),"JSON-LD");
+            dataset.addNamedModel(pair.getValue1(), model);
+        }
 
         FusekiServer server = FusekiServer.create()
-                .add("/linkedRecipes", mergedRecipeDatasets)
+                .add("/linkedRecipes", dataset)
                 .build();
 
         server.start();

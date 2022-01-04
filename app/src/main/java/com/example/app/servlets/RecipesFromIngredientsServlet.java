@@ -28,6 +28,7 @@ public class RecipesFromIngredientsServlet extends HttpServlet {
         repo.init();
         RepositoryConnection connection = repo.getConnection();
 
+
         response.getWriter().println("Created sparql repository");
 
         /*
@@ -63,16 +64,20 @@ public class RecipesFromIngredientsServlet extends HttpServlet {
 
         response.getWriter().println(queryString);
 
-        // List<BindingSet> bindings = Repositories.tupleQuery(repo, queryString, r -> QueryResults.asList(r));
-
         TupleQueryResult result =
                 connection.prepareTupleQuery(QueryLanguage.SPARQL, queryString).evaluate();
+
+        response.getWriter().println("Evaluated prepared tuple query");
 
         while(result.hasNext()) {
             BindingSet bs = result.next();
             Value route = bs.getValue("s");
             response.getWriter().println("s = " + route.stringValue());
         }
+
+        response.getWriter().println("Finished result iteration");
+
+        // List<BindingSet> bindings = Repositories.tupleQuery(repo, queryString, r -> QueryResults.asList(r));
 
         /*
         response.getWriter().println("Bindings");
