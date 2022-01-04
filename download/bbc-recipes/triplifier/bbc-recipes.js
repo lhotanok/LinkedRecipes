@@ -6,8 +6,7 @@ const IRI_BASE = 'http://example.org/resource/dataset/bbcRecipes';
 
 const XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
 const XSD_FLOAT = 'http://www.w3.org/2001/XMLSchema#float';
-
-const OWL_MINUTES = 'http://www.w3.org/TR/owl-time/#time:minutes';
+const XSD_DECIMAL = 'http://www.w3.org/2001/XMLSchema#decimal';
 
 main();
 
@@ -50,8 +49,8 @@ function main() {
             name: normalizeText(title),
             description,
             id,
-            cooking_time: convertToMinutes(cooking_time),
-            prep_time: convertToMinutes(prep_time),
+            cooking_time: buildRecipeTimeMinutes(cooking_time, 'cooking_time', RECIPE_IRI),
+            prep_time: buildRecipeTimeMinutes(prep_time, 'prep_time', RECIPE_IRI),
             serves,
             ratings: buildRecipeAggregateRating(ratings, RECIPE_IRI),
             nutrition_info: buildRecipeNutritionInformation(nutrition_info, RECIPE_IRI),
@@ -120,13 +119,11 @@ function buildJsonldContext() {
         "label": "http://www.w3.org/2000/01/rdf-schema#label",
         "subClassOf": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
         "author": "http://schema.org/contributor",
-        "prep_time": { 
-            "@id": "http://schema.org/prepTime",
-            "@type": OWL_MINUTES
-        },
-        "cooking_time": { 
-            "@id": "http://schema.org/cookTime",
-            "@type": OWL_MINUTES
+        "prep_time": "http://schema.org/prepTime",
+        "cooking_time": "http://schema.org/cookTime",
+        "minutes": {
+            "@id": "http://www.w3.org/TR/owl-time/#time:minutes",
+            "@type": XSD_DECIMAL
         },
         "serves": { 
             "@id":"http://schema.org/recipeYield",
@@ -219,6 +216,13 @@ function convertToIri(text) {
     const lowercaseText = text.toLowerCase();
 
     return lowercaseText.replace(/[^a-zA-Z0-9-_ ]/g, '').replace(/( )+/g, '-');
+}
+
+function buildRecipeTimeMinutes(time, timeName, recipeIri) {
+    return {
+        '@id': `${recipeIri}/${timeName}`,
+        minutes: convertToMinutes(time)
+    }
 }
 
 function buildRecipeAggregateRating(ratings, recipeIri) {

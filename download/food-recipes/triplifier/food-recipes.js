@@ -6,9 +6,8 @@ const IRI_BASE = 'http://example.org/resource/dataset/foodRecipes';
 
 const XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
 const XSD_FLOAT = 'http://www.w3.org/2001/XMLSchema#float';
+const XSD_DECIMAL = 'http://www.w3.org/2001/XMLSchema#decimal';
 const XSD_DATE = 'http://www.w3.org/2001/XMLSchema#date';
-
-const OWL_MINUTES = 'http://www.w3.org/TR/owl-time/#time:minutes';
 
 main();
 
@@ -49,7 +48,7 @@ function main() {
             name: normalizedName,
             id,
             description: normalizeText(description),
-            minutes,
+            totalTime: buildRecipeTimeMinutes(minutes, RECIPE_IRI),
             submitted,
             author: extractIds(entities.authors),
             ingredients: extractIds(entities.ingredients),
@@ -149,9 +148,10 @@ function buildJsonldContext() {
         },
         "label": "http://www.w3.org/2000/01/rdf-schema#label",
         "subClassOf": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
-        "minutes": { 
-            "@id": "http://schema.org/totalTime",
-            "@type": OWL_MINUTES
+        "totalTime": "http://schema.org/totalTime",
+        "minutes": {
+            "@id": "http://www.w3.org/TR/owl-time/#time:minutes",
+            "@type": XSD_DECIMAL
         },
         "submitted": { 
             "@id": "http://schema.org/datePublished",
@@ -224,6 +224,13 @@ function buildClassDefinition({ name, subClassOf }, context) {
         type: 'Class',
         label: name,
         subClassOf: { '@id': context[subClassOf] },
+    }
+}
+
+function buildRecipeTimeMinutes(minutes, recipeIri) {
+    return {
+        '@id': `${recipeIri}/totalTime`,
+        minutes,
     }
 }
 

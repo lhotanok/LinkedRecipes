@@ -7,8 +7,7 @@ const IRI_BASE = 'http://example.org/resource/dataset/allRecipes';
 
 const XSD_INTEGER = 'http://www.w3.org/2001/XMLSchema#integer';
 const XSD_FLOAT = 'http://www.w3.org/2001/XMLSchema#float';
-
-const OWL_MINUTES = 'http://www.w3.org/TR/owl-time/#time:minutes';
+const XSD_DECIMAL = 'http://www.w3.org/2001/XMLSchema#decimal';
 
 main();
 
@@ -44,9 +43,9 @@ function main() {
             name,
             url,
             servings,
-            prepTime: parseMinutes(prepTime),
-            cookTime: parseMinutes(cookTime),
-            totalTime: parseMinutes(totalTime),
+            prepTime: buildRecipeTimeMinutes(prepTime, 'prepTime', RECIPE_IRI),
+            cookTime: buildRecipeTimeMinutes(cookTime, 'cookTime', RECIPE_IRI),
+            totalTime: buildRecipeTimeMinutes(totalTime, 'totalTime', RECIPE_IRI),
             ingredients: buildRecipeIngredients(parsedIngredients, RECIPE_IRI),
             rating: buildAggregateRating(rating, reviews, RECIPE_IRI),
             directions: buildRecipeInstructions(directions, RECIPE_IRI),
@@ -104,17 +103,20 @@ function buildJsonldContext() {
             "@id": "http://schema.org/url",
             "@type": "http://schema.org/URL"
         },
-        "prepTime": { 
-            "@id": "http://schema.org/prepTime",
-            "@type": OWL_MINUTES
+        "prepTime": "http://schema.org/prepTime",
+        "cookTime": "http://schema.org/cookTime",
+        "totalTime": "http://schema.org/totalTime",
+        "minutes": {
+            "@id": "http://www.w3.org/TR/owl-time/#time:minutes",
+            "@type": XSD_DECIMAL
         },
-        "cookTime": { 
-            "@id": "http://schema.org/cookTime",
-            "@type": OWL_MINUTES
+        "days": {
+            "@id": "http://www.w3.org/TR/owl-time/#time:days",
+            "@type": XSD_DECIMAL
         },
-        "totalTime": { 
-            "@id": "http://schema.org/totalTime",
-            "@type": OWL_MINUTES
+        "weeks": {
+            "@id": "http://www.w3.org/TR/owl-time/#time:weeks",
+            "@type": XSD_DECIMAL
         },
         "ingredients": "http://schema.org/recipeIngredient",
         "amount": "http://purl.org/goodrelations/v1#hasEligibleQuantity",
@@ -236,6 +238,24 @@ function parseMinutes(text) {
     }
 
     return minutes;
+}
+
+function buildRecipeTimeMinutes(time, timeName, recipeIri) {
+    const timeValue = parseMinutes(time);
+
+    const timeNode = {
+        '@id': `${recipeIri}/${timeName}`
+    };
+
+    if (time && time.includes('week')) {
+        timeNode.weeks = timeValue;
+    } else if (time && time.includes('day')) {
+        timeNode.days = timeValue;
+    } else {
+        timeNode.minutes = timeValue;
+    }
+
+    return timeNode;
 }
 
 function buildAggregateRating(ratings, reviewCount, recipeIri) {
