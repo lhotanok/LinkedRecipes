@@ -1,0 +1,22 @@
+# Select all recipes with high protein content and low carbohydrate content.
+# Order the resulting recipes from the best rated recipes.
+
+PREFIX schema: <http://schema.org/>
+PREFIX gr: <http://purl.org/goodrelations/v1#>
+
+SELECT ?recipe ?proteinAmount ?carbohydrateAmount ?rating
+WHERE {
+    ?recipe schema:nutrition ?nutrition ;
+            schema:aggregateRating ?aggregateRating .
+
+    ?nutrition schema:proteinContent ?protein .
+    ?nutrition schema:carbohydrateContent ?carbohydrate .
+  
+    ?protein gr:hasValueFloat ?proteinAmount .
+    ?carbohydrate gr:hasValueFloat ?carbohydrateAmount .
+ 
+  	?aggregateRating schema:ratingValue ?rating .
+    
+    FILTER ( ?proteinAmount > 50 && ?carbohydrateAmount < 12 ) 
+}
+ORDER BY DESC(?rating)

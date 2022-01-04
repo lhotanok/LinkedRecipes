@@ -1,4 +1,4 @@
-# Select all recipes that contain chicken and mozzarella.
+# Select all recipes containing chicken and mozzarella.
 # Exclude recipes with broccoli ingredient.
 
 PREFIX schema: <http://schema.org/>
