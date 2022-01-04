@@ -14,8 +14,8 @@ WHERE {
   
     ?protein gr:hasValueFloat ?proteinAmount .
     ?carbohydrate gr:hasValueFloat ?carbohydrateAmount .
- 
-  	?aggregateRating schema:ratingValue ?rating .
+    
+    ?aggregateRating schema:ratingValue ?rating .
     
     FILTER ( ?proteinAmount > 50 && ?carbohydrateAmount < 12 ) 
 }

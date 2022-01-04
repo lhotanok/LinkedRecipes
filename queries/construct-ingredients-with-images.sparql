@@ -6,15 +6,15 @@ PREFIX schema: <http://schema.org/>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 
 CONSTRUCT {
-	?ingredient schema:image ?image .
+    ?ingredient schema:image ?image .
 }
 WHERE {
-	?ingredient a ex:Ingredient .
-	?ingredient owl:sameAs ?sameIngredient .
-	{
-		SERVICE  <https://query.wikidata.org/bigdata/namespace/wdq/sparql> 
-		{
-			?sameIngredient wdt:P18 ?image .
-		}
-	}
+    ?ingredient a ex:Ingredient .
+    ?ingredient owl:sameAs ?sameIngredient .
+    {
+        SERVICE  <https://query.wikidata.org/bigdata/namespace/wdq/sparql> 
+        {
+            ?sameIngredient wdt:P18 ?image .
+        }
+    }
 }
