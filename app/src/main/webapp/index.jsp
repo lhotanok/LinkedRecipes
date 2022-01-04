@@ -8,6 +8,6 @@
 <h1><%= "Linked Recipes" %>
 </h1>
 <br/>
-<a href="recipes-from-ingredients-servlet">Recipes from ingredients servlet</a>
+<a href="recipes-from-ingredients-servlet">Select recipes containing chicken and mozzarella and no broccoli</a>
 </body>
 </html>
