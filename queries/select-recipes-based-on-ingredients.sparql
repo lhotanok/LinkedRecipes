@@ -16,12 +16,11 @@ WHERE {
         ?ingredientEntity skos:prefLabel ?ingredientLabel .
     }
 
-    BIND(IF(CONTAINS(LCASE(STR(?ingredientLabel)), "chicken"), true, false) as ?containsChicken) .
-    BIND(IF(CONTAINS(LCASE(STR(?ingredientLabel)), "mozzarella"), true, false) as ?containsMozzarella) .
-  	BIND(IF(CONTAINS(LCASE(STR(?ingredientLabel)), "broccoli"), true, false) as ?containsBroccoli) .
+    VALUES ?requestedIngredients { "chicken" "mozzarella" "broccoli" }
+    BIND(IF(CONTAINS(LCASE(STR(?ingredientLabel)), ?requestedIngredients), true, false) as ?containsIngredient)
     
     # Filter recipes that include queried ingredients (broccoli recipes will be excluded afterwards).
-    FILTER(?containsChicken = true || ?containsMozzarella = true || ?containsBroccoli = true)
+    FILTER(?containsIngredient = true)
 }
 GROUP BY ?recipe
 HAVING (CONTAINS(LCASE(STR(?ingredientLabels)), "chicken")
