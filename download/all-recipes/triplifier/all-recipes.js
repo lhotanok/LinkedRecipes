@@ -1,4 +1,3 @@
-const { countReset } = require('console');
 const fs = require('fs');
 
 const INPUT_PATH = `${__dirname}/../input/all-recipes.json`;

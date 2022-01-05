@@ -12,61 +12,28 @@ import org.eclipse.rdf4j.query.*;
 import static j2html.TagCreator.*;
 
 @WebServlet(name = "recipesFromIngredientsServlet", value = "/recipes-from-ingredients-servlet")
-public class RecipesFromIngredientsServlet extends HttpServlet {
-    public void init() { }
+public class RecipesFromIngredientsServlet extends QueryServlet {
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        var writer = response.getWriter();
-
-        var repositoryHandler = new RepositoryHandler();
-        repositoryHandler.initializeRepository();
-
-        try {
-            repositoryHandler.initializeConnection();
-
-            TupleQuery tupleQuery = repositoryHandler.prepareConnectionTupleQuery(createSelectQuery());
-            TupleQueryResult result = tupleQuery.evaluate();
-
-            List<ContainerTag> divContainers = new ArrayList<>();
-
-            for (var bindingSet : result) {
-                var divContainer = buildContainer(bindingSet);
-                divContainers.add(divContainer);
-            }
-
-            var html = body(
-                    h1("Recipes containing chicken and mozzarella"),
-                    each(divContainers, container -> container)
-            ).render();
-
-            writer.println(html);
-
-        } catch (Exception ex) {
-            writer.println(ex);
-        } finally {
-            repositoryHandler.closeConnection();
-        }
-    }
-
-    public void destroy() {
-    }
-
-    private ContainerTag buildContainer(BindingSet bindingSet) {
-        var recipeIri = "<" + bindingSet.getValue("recipe").stringValue() + ">";
+    @Override
+    protected ContainerTag buildContainer(BindingSet bindingSet) {
         var recipeName = bindingSet.getValue("recipeName").stringValue();
+        var recipeUrl = bindingSet.getValue("recipe").stringValue();
 
-        var divRecipeIri = div(attrs(".recipeIri"), p(recipeIri));
-
-        var divRecipeName = div(attrs(".recipeName"), h2(recipeName))
-                .withData("property", "schema:recipeIngredient");
+        var divRecipeName = a(attrs(".recipeName"),
+                h2(recipeName))
+                .withData("property", "schema:name")
+                .withHref(recipeUrl);
 
         var ingredientLabels = bindingSet.getValue("ingredientLabels").toString();
         var matchedIngredients = buildMatchedIngredients(ingredientLabels);
 
+        var divMatchedIngredients = div(attrs(".ingredients"),
+            h3("Matched ingredients"),
+                matchedIngredients);
+
         var divContainer = div(attrs(".recipe"),
                 divRecipeName,
-                divRecipeIri,
-                matchedIngredients)
+                divMatchedIngredients)
                 .withData("typeof", "schema:Recipe")
                 .withData("prefix", "schema: http://schema.org/");
 
@@ -79,15 +46,21 @@ public class RecipesFromIngredientsServlet extends HttpServlet {
 
         List<ContainerTag> tags = new ArrayList<>();
         for (var label : parsedLabels) {
-            tags.add(div(attrs(".ingredient"), p(label))
-                    .withCondData(false, "property", "schema:recipeIngredient"));
+            tags.add(li(div(attrs(".ingredient"), p(label))
+                    .withData("property", "schema:recipeIngredient")));
 
         }
 
         return ul(each(tags, tag -> tag));
     }
 
-    private String createSelectQuery() {
+    @Override
+    protected String getPageTitle() {
+        return "Recipes containing chicken and mozzarella";
+    }
+
+    @Override
+    protected String createSelectQuery() {
         return  "PREFIX schema: <http://schema.org/>\n" +
                 "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
                 "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" +

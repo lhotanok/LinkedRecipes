@@ -4,10 +4,11 @@
 PREFIX schema: <http://schema.org/>
 PREFIX gr: <http://purl.org/goodrelations/v1#>
 
-SELECT ?recipe ?proteinAmount ?carbohydrateAmount ?rating
+SELECT ?recipe ?recipeName ?proteinAmount ?carbohydrateAmount ?rating
 WHERE {
     ?recipe schema:nutrition ?nutrition ;
-            schema:aggregateRating ?aggregateRating .
+            schema:aggregateRating ?aggregateRating ;
+            schema:name ?recipeName .
 
     ?nutrition schema:proteinContent ?protein .
     ?nutrition schema:carbohydrateContent ?carbohydrate .

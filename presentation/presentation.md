@@ -2,15 +2,21 @@
 
 ## Dataset sources
 
+### Apify scraper
+
 ![](..\presentation\images\allrecipes-actor.png)
 
 ![](..\presentation\images\allrecipes-actor-input.png)
 
 ![](..\presentation\images\allrecipes-actor-input-extend.png)
 
-
+### Kaggle dataset
 
 ![](..\presentation\images\kaggle-foodrecipes-dataset.png)
+
+### Dataset UML class model
+
+![](..\source\diagram.png)
 
 ## Triplification
 
@@ -87,7 +93,7 @@ jsonld normalize -q "./food-recipes/output/food-recipes.jsonld" > "./food-recipe
 
 ### Entities
 
-- Ingredients
+- Ingredients (singular vs plural, doubled characters)
 - Tags
 - Cusines
 - Calories (exact match)
@@ -103,3 +109,8 @@ jsonld normalize -q "./food-recipes/output/food-recipes.jsonld" > "./food-recipe
 - Ingredients with description from dbpedia and images from wikidata
 - Recipe search based on required set of ingredients
 - Recipe search based on nutrition information (high protein content, low carbohydrate content... )
+
+## App
+
+![](..\presentation\images\select-query-app-result.png)
+
