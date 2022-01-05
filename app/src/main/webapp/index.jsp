@@ -14,5 +14,8 @@
 <h2>
     <a href="recipes-from-nutrition-servlet">Select recipes with high protein content and low carbohydrate content</a>
 </h2>
+<h2>
+    <a href="ingredient-images-servlet">Construct ingredients with images</a>
+</h2>
 </body>
 </html>

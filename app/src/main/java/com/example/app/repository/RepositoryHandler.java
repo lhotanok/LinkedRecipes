@@ -1,5 +1,6 @@
 package com.example.app.repository;
 
+import org.eclipse.rdf4j.query.GraphQuery;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -32,10 +33,15 @@ public class RepositoryHandler {
         return connection.prepareTupleQuery(query);
     }
 
+    public GraphQuery prepareConnectionGraphQuery(String query) {
+        return connection.prepareGraphQuery(query);
+    }
+
     private void addAllDatasetsIntoConnection() {
         addFileToConnection(connection, "all-recipes.jsonld", "allRecipes", RDFFormat.JSONLD);
         addFileToConnection(connection, "bbc-recipes.jsonld", "bbcRecipes", RDFFormat.JSONLD);
         addFileToConnection(connection, "food-recipes.jsonld", "foodRecipes", RDFFormat.JSONLD);
+        addFileToConnection(connection, "all-wikidata-ingredients.nt", "allWikidataIngredients", RDFFormat.NTRIPLES);
     }
 
     private void addFileToConnection(RepositoryConnection connection, String filePath, String fileName, RDFFormat fileFormat) {

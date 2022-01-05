@@ -1,23 +1,14 @@
 package com.example.app.servlets;
 
-import com.example.app.repository.RepositoryHandler;
 import j2html.tags.ContainerTag;
 import org.eclipse.rdf4j.query.BindingSet;
-import org.eclipse.rdf4j.query.TupleQuery;
-import org.eclipse.rdf4j.query.TupleQueryResult;
 
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static j2html.TagCreator.*;
 
 @WebServlet(name = "recipesFromNutritionServlet", value = "/recipes-from-nutrition-servlet")
-public class RecipesFromNutritionServlet extends QueryServlet {
+public class RecipesFromNutritionServlet extends SelectQueryServlet {
 
     @Override
     protected ContainerTag buildContainer(BindingSet bindingSet) {

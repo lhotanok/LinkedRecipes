@@ -1,18 +1,15 @@
 package com.example.app.servlets;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 
-import com.example.app.repository.RepositoryHandler;
 import j2html.tags.ContainerTag;
 import org.eclipse.rdf4j.query.*;
 import static j2html.TagCreator.*;
 
 @WebServlet(name = "recipesFromIngredientsServlet", value = "/recipes-from-ingredients-servlet")
-public class RecipesFromIngredientsServlet extends QueryServlet {
+public class RecipesFromIngredientsServlet extends SelectQueryServlet {
 
     @Override
     protected ContainerTag buildContainer(BindingSet bindingSet) {
