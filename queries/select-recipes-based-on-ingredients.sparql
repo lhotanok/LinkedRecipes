@@ -6,7 +6,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX ex: <http://example.org/ns#>
 
-SELECT ?recipe (GROUP_CONCAT(?ingredientLabel;separator=" | ") AS ?ingredientLabels)
+SELECT ?recipe ?recipeName (GROUP_CONCAT(?ingredientLabel;separator=" | ") AS ?ingredientLabels)
 WHERE {
     ?recipe schema:recipeIngredient ?ingredient .
     {
@@ -16,13 +16,15 @@ WHERE {
         ?ingredientEntity skos:prefLabel ?ingredientLabel .
     }
 
+    ?recipe schema:name ?recipeName .
+
     VALUES ?requestedIngredients { "chicken" "mozzarella" "broccoli" }
     BIND(IF(CONTAINS(LCASE(STR(?ingredientLabel)), ?requestedIngredients), true, false) as ?containsIngredient)
     
     # Filter recipes that include queried ingredients (broccoli recipes will be excluded afterwards).
     FILTER(?containsIngredient = true)
 }
-GROUP BY ?recipe
+GROUP BY ?recipe ?recipeName
 HAVING (CONTAINS(LCASE(STR(?ingredientLabels)), "chicken")
   && CONTAINS(LCASE(STR(?ingredientLabels)), "mozzarella")
   && !CONTAINS(LCASE(STR(?ingredientLabels)), "broccoli"))
