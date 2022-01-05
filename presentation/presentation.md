@@ -116,3 +116,5 @@ jsonld normalize -q "./food-recipes/output/food-recipes.jsonld" > "./food-recipe
 
 <img src="..\presentation\images\select-query-app-result-2.png" />
 
+<img src="..\presentation\images\select-query-app-result-3.png" />
+

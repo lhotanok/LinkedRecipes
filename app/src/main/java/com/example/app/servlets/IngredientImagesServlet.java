@@ -44,7 +44,7 @@ public class IngredientImagesServlet extends ConstructQueryServlet {
                 .withSrc(image)
                 .withAlt(ingredientName)
                 .withData("property", property)
-                .withStyle("max-width: 300px");
+                .withStyle("max-width: 300px; max-height: 300px");
 
         var divContainer = div(attrs(".ingredient"), h2(ingredientName), imgElement)
                 .withHref(ingredient);
