@@ -1,15 +1,15 @@
 package com.example.app.servlets;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 
 import com.example.app.repository.RepositoryHandler;
-import org.apache.jena.reasoner.rulesys.builtins.Print;
-import org.eclipse.rdf4j.model.Value;
+import j2html.tags.ContainerTag;
 import org.eclipse.rdf4j.query.*;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.rio.RDFFormat;
+import static j2html.TagCreator.*;
 
 @WebServlet(name = "recipesFromIngredientsServlet", value = "/recipes-from-ingredients-servlet")
 public class RecipesFromIngredientsServlet extends HttpServlet {
@@ -27,15 +27,19 @@ public class RecipesFromIngredientsServlet extends HttpServlet {
             TupleQuery tupleQuery = repositoryHandler.prepareConnectionTupleQuery(createSelectQuery());
             TupleQueryResult result = tupleQuery.evaluate();
 
-            for (var bindingSet : result) {
-                var recipeIri = "<" + bindingSet.getValue("recipe").stringValue() + ">";
-                var recipeName = bindingSet.getValue("recipeName").stringValue();
-                writer.println("Recipe IRI: " + recipeIri);
-                writer.println("Recipe name: " + recipeName);
+            List<ContainerTag> divContainers = new ArrayList<>();
 
-                var ingredientLabels = bindingSet.getValue("ingredientLabels").toString();
-                printMatchedIngredients(ingredientLabels, writer);
+            for (var bindingSet : result) {
+                var divContainer = buildContainer(bindingSet);
+                divContainers.add(divContainer);
             }
+
+            var html = body(
+                    h1("Recipes containing chicken and mozzarella"),
+                    each(divContainers, container -> container)
+            ).render();
+
+            writer.println(html);
 
         } catch (Exception ex) {
             writer.println(ex);
@@ -47,15 +51,40 @@ public class RecipesFromIngredientsServlet extends HttpServlet {
     public void destroy() {
     }
 
-    private void printMatchedIngredients(String ingredientLabels, PrintWriter writer) {
+    private ContainerTag buildContainer(BindingSet bindingSet) {
+        var recipeIri = "<" + bindingSet.getValue("recipe").stringValue() + ">";
+        var recipeName = bindingSet.getValue("recipeName").stringValue();
+
+        var divRecipeIri = div(attrs(".recipeIri"), p(recipeIri));
+
+        var divRecipeName = div(attrs(".recipeName"), h2(recipeName))
+                .withData("property", "schema:recipeIngredient");
+
+        var ingredientLabels = bindingSet.getValue("ingredientLabels").toString();
+        var matchedIngredients = buildMatchedIngredients(ingredientLabels);
+
+        var divContainer = div(attrs(".recipe"),
+                divRecipeName,
+                divRecipeIri,
+                matchedIngredients)
+                .withData("typeof", "schema:Recipe")
+                .withData("prefix", "schema: http://schema.org/");
+
+        return divContainer;
+    }
+
+    private ContainerTag buildMatchedIngredients(String ingredientLabels) {
         var trimmedLabels = ingredientLabels.substring(1, ingredientLabels.length() - 1);
         var parsedLabels = trimmedLabels.split(" \\| ");
-        writer.println("Matched ingredients:");
+
+        List<ContainerTag> tags = new ArrayList<>();
         for (var label : parsedLabels) {
-            writer.println("\t" + label);
+            tags.add(div(attrs(".ingredient"), p(label))
+                    .withCondData(false, "property", "schema:recipeIngredient"));
+
         }
 
-        writer.println();
+        return ul(each(tags, tag -> tag));
     }
 
     private String createSelectQuery() {
