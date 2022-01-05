@@ -4,19 +4,19 @@
 
 ### Apify scraper
 
-![](..\presentation\images\allrecipes-actor.png)
+<img src="..\presentation\images\allrecipes-actor.png" />
 
-![](..\presentation\images\allrecipes-actor-input.png)
+<img src="..\presentation\images\allrecipes-actor-input.png" />
 
-![](..\presentation\images\allrecipes-actor-input-extend.png)
+<img src="..\presentation\images\allrecipes-actor-input-extend.png" />
 
 ### Kaggle dataset
 
-![](..\presentation\images\kaggle-foodrecipes-dataset.png)
+<img src="..\presentation\images\kaggle-foodrecipes-dataset.png" />
 
 ### Dataset UML class model
 
-![](..\source\diagram.png)
+<img src="..\source\diagram.png" />
 
 ## Triplification
 
@@ -112,5 +112,7 @@ jsonld normalize -q "./food-recipes/output/food-recipes.jsonld" > "./food-recipe
 
 ## App
 
-![](..\presentation\images\select-query-app-result.png)
+<img src="..\presentation\images\select-query-app-result.png" />
+
+<img src="..\presentation\images\select-query-app-result-2.png" />
 
